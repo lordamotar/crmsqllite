@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Права (ACL){% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-datatable">
+    <div class="row mx-2">
+      <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+        <div class="dt-length mb-0 mb-md-5">
+          <label for="dt-length-0">Show</label>
+          <select class="form-select form-select-sm" id="dt-length-0" onchange="window.location.href='?page=1&length='+this.value;">
+            <option value="10" {% if permissions.per_page == 10 %}selected{% endif %}>10</option>
+            <option value="25" {% if permissions.per_page == 25 %}selected{% endif %}>25</option>
+            <option value="50" {% if permissions.per_page == 50 %}selected{% endif %}>50</option>
+            <option value="100" {% if permissions.per_page == 100 %}selected{% endif %}>100</option>
+          </select>
+        </div>
+      </div>
+      <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+        <div class="dt-search me-4">
+          <input type="search" class="form-control form-control-sm" id="dt-search-0" placeholder="Поиск права">
+          <label for="dt-search-0"></label>
+        </div>
+      </div>
+    </div>
+    <div class="dt-layout-table table-responsive">
+      <table class="table" id="DataTables_Table_0">
+        <thead>
+          <tr><th>Код</th><th>Модель</th><th>Приложение</th></tr>
+        </thead>
+        <tbody>
+          {% for p in permissions.object_list %}
+          <tr>
+            <td>{{ p.codename }}</td>
+            <td>{{ p.content_type.model }}</td>
+            <td>{{ p.content_type.app_label }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-center text-muted py-5">Права не найдены</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="row mx-3 justify-content-between">
+      <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+        <div class="dt-info">Показано {{ permissions.start_index }} - {{ permissions.end_index }} из {{ permissions.paginator.count }} записей</div>
+      </div>
+      <div class="align-items-center dt-layout-end col-md-auto ms-auto d-flex">
+        <div class="dt-paging">
+          {% if permissions.has_other_pages %}
+          <nav aria-label="pagination">
+            <ul class="pagination">
+              <li class="page-item {% if not permissions.has_previous %}disabled{% endif %}"><a class="page-link" href="?page=1"><i class="ri ri-skip-back-mini-line"></i></a></li>
+              <li class="page-item {% if not permissions.has_previous %}disabled{% endif %}">
+                {% if permissions.has_previous %}<a class="page-link" href="?page={{ permissions.previous_page_number }}"><i class="ri ri-arrow-left-s-line"></i></a>{% else %}<span class="page-link"><i class="ri ri-arrow-left-s-line"></i></span>{% endif %}
+              </li>
+              <li class="page-item active"><span class="page-link">{{ permissions.number }}</span></li>
+              <li class="page-item {% if not permissions.has_next %}disabled{% endif %}">
+                {% if permissions.has_next %}<a class="page-link" href="?page={{ permissions.next_page_number }}"><i class="ri ri-arrow-right-s-line"></i></a>{% else %}<span class="page-link"><i class="ri ri-arrow-right-s-line"></i></span>{% endif %}
+              </li>
+              <li class="page-item {% if not permissions.has_next %}disabled{% endif %}"><a class="page-link" href="?page={{ permissions.paginator.num_pages }}"><i class="ri ri-skip-forward-mini-line"></i></a></li>
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const q=document.getElementById('dt-search-0');const tbody=document.querySelector('#DataTables_Table_0 tbody');if(!q||!tbody)return;function n(t){return(t||'').toString().toLowerCase().trim()}q.addEventListener('input',e=>{const s=n(e.target.value);[...tbody.querySelectorAll('tr')].forEach(tr=>{const a=[...tr.cells].map(td=>n(td.innerText)).join(' ');tr.style.display=s===''||a.includes(s)?'':'none';});});
+})();
+</script>
+{% endblock %}
+

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить город{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <form id="add-city-form">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Название города <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Область</label>
+            <input type="text" name="region" class="form-control">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Страна</label>
+            <input type="text" name="country" class="form-control" value="Казахстан">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary">Добавить город</button>
+            <a href="{% url 'cities:cities_list' %}" class="btn btn-secondary ms-2">Отмена</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('add-city-form');
+    
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      
+      fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          window.location.href = data.redirect_url;
+        } else {
+          alert(data.message || 'Ошибка при добавлении города');
+        }
+      })
+      .catch(error => {
+        alert('Сетевая ошибка');
+        console.error(error);
+      });
+    });
+  });
+  </script>
+{% endblock %}

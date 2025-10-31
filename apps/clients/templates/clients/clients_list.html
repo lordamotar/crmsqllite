@@ -1,0 +1,526 @@
+{% extends 'base.html' %}
+{% load client_filters %}
+
+{% block title %}Клиенты{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-datatable">
+      <div id="DataTables_Table_0_wrapper" class="dt-container dt-bootstrap5 dt-empty-footer">
+        <div class="row mx-2">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+            <div class="dt-length mb-0 mb-md-5">
+              <label for="dt-length-0">Show</label>
+              <select class="form-select form-select-sm" id="dt-length-0">
+                <option value="10" {% if current_per_page == 10 %}selected{% endif %}>10</option>
+                <option value="25" {% if current_per_page == 25 %}selected{% endif %}>25</option>
+                <option value="50" {% if current_per_page == 50 %}selected{% endif %}>50</option>
+                <option value="100" {% if current_per_page == 100 %}selected{% endif %}>100</option>
+              </select>
+            </div>
+          </div>
+          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+            <div class="dt-search me-4">
+              <input type="search" class="form-control form-control-sm" id="dt-search-0" placeholder="Поиск: телефон или ФИО/компания">
+              <label for="dt-search-0"></label>
+            </div>
+            <div class="dt-buttons btn-group flex-wrap mb-0 w-auto">
+              <a href="{% url 'clients:add_client' %}" class="btn add-new btn-primary">
+                <span>
+                  <i class="icon-base ri ri-add-line icon-sm me-0 me-sm-1"></i>
+                  <span class="d-none d-sm-inline-block">Добавить клиента</span>
+                </span>
+              </a>
+              <button type="button" class="btn btn-outline-primary" id="import-excel-btn">
+                <span>
+                  <i class="icon-base ri ri-file-excel-line icon-sm me-0 me-sm-1"></i>
+                  <span class="d-none d-sm-inline-block">Загрузить из Excel</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="justify-content-between dt-layout-table">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-full table-responsive">
+            <table class="datatables-permissions table dataTable dtr-column" id="DataTables_Table_0" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th class="dtr-hidden" style="display:none;"></th>
+                  <th>Действия</th>
+                  <th>
+                    <a href="?sort=name&order={% if current_sort == 'name' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Имя/Компания
+                      {% if current_sort == 'name' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=client_type&order={% if current_sort == 'client_type' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Тип
+                      {% if current_sort == 'client_type' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=phone&order={% if current_sort == 'phone' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Телефон
+                      {% if current_sort == 'phone' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=city&order={% if current_sort == 'city' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Город
+                      {% if current_sort == 'city' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=created_at&order={% if current_sort == 'created_at' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Создан
+                      {% if current_sort == 'created_at' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody">
+                {% for client in clients %}
+                <tr data-name="{{ client.name|lower }}" data-phone="{% if client.phones.first %}{{ client.phones.first.phone }}{% else %}{% endif %}">
+                  <td class="dtr-hidden" style="display:none;"></td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="text-nowrap">
+                        <a href="{% url 'clients:edit_client' client.id %}" class="btn btn-icon btn-text-secondary rounded-pill me-1" title="Редактировать">
+                          <i class="icon-base ri ri-edit-box-line icon-22px"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-icon btn-text-secondary rounded-pill text-body waves-effect btn-delete-client"
+                                data-client-id="{{ client.id }}" data-client-name="{{ client.name }}" title="Удалить">
+                          <i class="icon-base ri ri-delete-bin-7-line icon-22px"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </td>
+                  <td><span class="text-nowrap text-heading">{{ client.name }}</span></td>
+                  <td>
+                    {% if client.client_type == 'individual' %}
+                      <span class="badge rounded-pill bg-label-success">Физ. лицо</span>
+                    {% else %}
+                      <span class="badge rounded-pill bg-label-danger">Юр. лицо</span>
+                    {% endif %}
+                  </td>
+                  <td><span class="text-nowrap">{% if client.phones.first %}{{ client.phones.first.phone|format_phone }}{% else %}—{% endif %}</span></td>
+                  <td><span class="text-nowrap">{% if client.addresses.first %}{{ client.addresses.first.city }}{% else %}—{% endif %}</span></td>
+                  <td><span class="text-nowrap">{{ client.created_at|date:"d M Y, H:i" }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-5">Клиенты не найдены</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mx-3 justify-content-between">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+            <div class="dt-info" aria-live="polite" id="DataTables_Table_0_info" role="status">
+              {% if clients.paginator %}
+                Showing {{ clients.start_index }} to {{ clients.end_index }} of {{ clients.paginator.count }} entries
+              {% else %}
+                Showing 1 to {{ clients|length }} of {{ clients|length }} entries
+              {% endif %}
+            </div>
+          </div>
+          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+            <div class="dt-paging">
+              {% if clients.has_other_pages %}
+              <nav aria-label="pagination">
+                <ul class="pagination">
+                  <li class="dt-paging-button page-item {% if not clients.has_previous %}disabled{% endif %}">
+                    <a class="page-link first" href="{% if clients.has_previous %}?page=1&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="First"><i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item {% if not clients.has_previous %}disabled{% endif %}">
+                    <a class="page-link previous" href="{% if clients.has_previous %}?page={{ clients.number|add:'-1' }}&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="Previous"><i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item active"><span class="page-link">{{ clients.number }}</span></li>
+                  <li class="dt-paging-button page-item {% if not clients.has_next %}disabled{% endif %}">
+                    <a class="page-link next" href="{% if clients.has_next %}?page={{ clients.number|add:'1' }}&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="Next"><i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item {% if not clients.has_next %}disabled{% endif %}">
+                    <a class="page-link last" href="{% if clients.has_next %}?page={{ clients.paginator.num_pages }}&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="Last"><i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                </ul>
+              </nav>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Excel Modal -->
+  <div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Загрузка клиентов из Excel</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="excel-file" class="form-label">Выберите Excel файл</label>
+            <input type="file" class="form-control" id="excel-file" accept=".xlsx,.xls">
+            <div class="form-text">
+              Поддерживаются файлы .xlsx и .xls. Обязательные колонки: Телефон, Тип клиента, ФИО/Компания
+            </div>
+          </div>
+          <div class="alert alert-info">
+            <h6><i class="ri-information-line me-2"></i>Формат Excel файла:</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-primary">Обязательные колонки:</h6>
+                <ul class="mb-2">
+                  <li><strong>Телефон</strong> - основной телефон клиента</li>
+                  <li><strong>Тип клиента</strong> - "Физическое лицо" или "Юридическое лицо"</li>
+                  <li><strong>ФИО/Компания</strong> - полное имя или название компании</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-secondary">Дополнительные колонки:</h6>
+                <ul class="mb-0">
+                  <li><strong>Телефон 2</strong> - дополнительный телефон</li>
+                  <li><strong>Email</strong> - email адрес</li>
+                  <li><strong>Фамилия, Имя, Отчество</strong> - для физических лиц</li>
+                  <li><strong>Город</strong> - город клиента</li>
+                </ul>
+              </div>
+            </div>
+            <div class="alert alert-warning mt-2 mb-0">
+              <small><i class="ri-lightbulb-line me-1"></i><strong>Важно:</strong> Существующие клиенты будут обновлены, новые - созданы.</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="button" class="btn btn-primary" id="confirm-import-btn" disabled>
+            <i class="ri-upload-line me-1"></i>Загрузить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Results Modal -->
+  <div class="modal fade" id="importResultsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Результаты импорта</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="import-results-body">
+          <!-- Результаты будут загружены динамически -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Закрыть</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="deleteClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подтверждение удаления</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Удалить клиента <strong id="delete-client-name"></strong>? Это действие нельзя отменить.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">Удалить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    // Переключение количества на странице — меняем URL (сохраняем сортировку и поиск)
+    const perSelect = document.getElementById('dt-length-0');
+    perSelect?.addEventListener('change', function(){
+      const params = new URLSearchParams(window.location.search);
+      params.set('per_page', this.value);
+      params.set('page', '1');
+      window.location.search = params.toString();
+    });
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const modalEl = document.getElementById('deleteClientModal');
+    const nameEl = document.getElementById('delete-client-name');
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    let currentClientId = null;
+
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('.btn-delete-client');
+      if (!btn) return;
+      currentClientId = btn.getAttribute('data-client-id');
+      nameEl.textContent = btn.getAttribute('data-client-name') || '';
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    });
+
+    confirmBtn.addEventListener('click', function() {
+      if (!currentClientId) return;
+      const url = `/clients/delete/${currentClientId}/`;
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      }).then(r => r.json())
+        .then(data => {
+          if (data.status === 'success') {
+            // remove row or reload
+            const row = document.querySelector(`[data-client-id="${currentClientId}"]`)?.closest('tr');
+            if (row) row.remove();
+            else window.location.reload();
+            bootstrap.Modal.getInstance(modalEl).hide();
+            
+            // Показать уведомление об успехе
+            if (window.showNotification) {
+              window.showNotification(data.message || 'Клиент успешно удален', 'success');
+            }
+          } else {
+            if (window.showNotification) {
+              window.showNotification(data.message || 'Ошибка удаления', 'error');
+            }
+          }
+        })
+        .catch(() => {
+          if (window.showNotification) {
+            window.showNotification('Сетевая ошибка', 'error');
+          }
+        });
+    });
+    // Мгновенный поиск по имени/компании и телефону (маска игнорируется)
+    const searchInput = document.getElementById('dt-search-0');
+    const tbody = document.getElementById('clients-tbody');
+    function normPhone(s){ return (s||'').replace(/[^0-9]/g,''); }
+    searchInput?.addEventListener('input', function(){
+      const q = (this.value || '').trim().toLowerCase();
+      const qDigits = normPhone(q);
+      const rows = tbody?.querySelectorAll('tr') || [];
+      rows.forEach(tr => {
+        const nameData = (tr.getAttribute('data-name') || '').toLowerCase();
+        const phoneData = normPhone(tr.getAttribute('data-phone') || '');
+        const matchName = q ? nameData.includes(q) : false;
+        const matchPhone = qDigits ? phoneData.includes(qDigits) : false;
+        tr.style.display = (!q) || matchName || matchPhone ? '' : 'none';
+      });
+    });
+
+    // Обработка импорта Excel
+    const importBtn = document.getElementById('import-excel-btn');
+    const importModal = document.getElementById('importExcelModal');
+    const confirmImportBtn = document.getElementById('confirm-import-btn');
+    const excelFileInput = document.getElementById('excel-file');
+    const importResultsModal = document.getElementById('importResultsModal');
+    const importResultsBody = document.getElementById('import-results-body');
+
+    // Открытие модального окна импорта
+    importBtn.addEventListener('click', function() {
+      const modal = new bootstrap.Modal(importModal);
+      modal.show();
+    });
+
+    // Активация кнопки загрузки при выборе файла
+    excelFileInput.addEventListener('change', function() {
+      confirmImportBtn.disabled = !this.files.length;
+    });
+
+    // Обработка загрузки файла
+    confirmImportBtn.addEventListener('click', function() {
+      const file = excelFileInput.files[0];
+      if (!file) return;
+
+      // Показываем индикатор загрузки
+      this.disabled = true;
+      this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Загрузка...';
+
+      const formData = new FormData();
+      formData.append('excel_file', file);
+
+      fetch('{% url "clients:import_clients_excel" %}', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Скрываем модальное окно импорта
+        bootstrap.Modal.getInstance(importModal).hide();
+        
+        // Показываем результаты
+        showImportResults(data);
+        
+        // Обновляем страницу если импорт был успешным
+        if (data.status === 'success' && data.imported > 0) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка импорта:', error);
+        showImportResults({
+          status: 'error',
+          message: 'Ошибка загрузки файла'
+        });
+      })
+      .finally(() => {
+        // Восстанавливаем кнопку
+        this.disabled = false;
+        this.innerHTML = '<i class="ri-upload-line me-1"></i>Загрузить';
+        excelFileInput.value = '';
+      });
+    });
+
+    // Функция показа результатов импорта
+    function showImportResults(data) {
+      let html = '';
+      
+      if (data.status === 'success') {
+        html = `
+          <div class="alert alert-success">
+            <h6><i class="ri-check-circle-line me-2"></i>Импорт завершен успешно!</h6>
+            <p class="mb-0">${data.message}</p>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title text-success">Обработано</h6>
+                  <h3 class="text-success">${data.imported}</h3>
+                  <small class="text-muted">Клиентов обновлено/создано</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title text-info">Всего строк</h6>
+                  <h3 class="text-info">${(data.imported || 0) + (data.skipped || 0)}</h3>
+                  <small class="text-muted">В файле</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title text-warning">Пропущено</h6>
+                  <h3 class="text-warning">${data.skipped || 0}</h3>
+                  <small class="text-muted">Ошибки/пустые</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        if (data.skipped > 0) {
+          html += `
+            <div class="mt-3">
+              <h6><i class="ri-information-line me-1"></i>Детали пропущенных записей:</h6>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="ri-file-text-line me-2 text-muted"></i>
+                    <span class="text-muted">Пустые строки:</span>
+                    <strong class="ms-2">${data.empty_rows || 0}</strong>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex align-items-center mb-2">
+                    <i class="ri-error-warning-line me-2 text-muted"></i>
+                    <span class="text-muted">Неверный тип:</span>
+                    <strong class="ms-2">${data.invalid_type || 0}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        if (data.errors && data.errors.length > 0) {
+          html += `
+            <div class="mt-3">
+              <h6 class="text-danger"><i class="ri-error-warning-line me-1"></i>Ошибки:</h6>
+              <div class="alert alert-danger">
+                <ul class="mb-0">
+                  ${data.errors.map(error => `<li><i class="ri-error-warning-line me-1"></i>${error}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        html = `
+          <div class="alert alert-danger">
+            <h6><i class="ri-error-warning-line me-2"></i>Ошибка импорта</h6>
+            <p class="mb-0">${data.message}</p>
+          </div>
+        `;
+      }
+      
+      importResultsBody.innerHTML = html;
+      const modal = new bootstrap.Modal(importResultsModal);
+      modal.show();
+    }
+
+  })();
+  </script>
+{% endblock %}
+
+
+

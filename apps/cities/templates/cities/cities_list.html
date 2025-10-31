@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Города{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-datatable">
+      <div id="DataTables_Table_0_wrapper" class="dt-container dt-bootstrap5 dt-empty-footer">
+        <div class="row mx-2">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+            <div class="dt-length mb-0 mb-md-5">
+              <label for="dt-length-0">Show</label>
+              <select class="form-select form-select-sm" id="dt-length-0">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+            <div class="dt-search me-4">
+              <input type="search" class="form-control form-control-sm" id="dt-search-0" placeholder="Поиск города" value="{{ request.GET.search }}">
+              <label for="dt-search-0"></label>
+            </div>
+            <div class="dt-buttons btn-group flex-wrap mb-0 w-auto">
+              <a href="{% url 'cities:add_city' %}" class="btn add-new btn-primary">
+                <span>
+                  <i class="icon-base ri ri-add-line icon-sm me-0 me-sm-1"></i>
+                  <span class="d-none d-sm-inline-block">Добавить город</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="justify-content-between dt-layout-table">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-full table-responsive">
+            <table class="datatables-permissions table dataTable dtr-column" id="DataTables_Table_0" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th class="dtr-hidden" style="display:none;"></th>
+                  <th>
+                    <a href="?sort=name&order={% if current_sort == 'name' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Название
+                      {% if current_sort == 'name' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=region&order={% if current_sort == 'region' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Область
+                      {% if current_sort == 'region' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=country&order={% if current_sort == 'country' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Страна
+                      {% if current_sort == 'country' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=is_active&order={% if current_sort == 'is_active' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Статус
+                      {% if current_sort == 'is_active' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>
+                    <a href="?sort=created_at&order={% if current_sort == 'created_at' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
+                       class="text-decoration-none text-body">
+                      Создан
+                      {% if current_sort == 'created_at' %}
+                        {% if current_order == 'asc' %}
+                          <i class="icon-base ri ri-arrow-up-line ms-1"></i>
+                        {% else %}
+                          <i class="icon-base ri ri-arrow-down-line ms-1"></i>
+                        {% endif %}
+                      {% endif %}
+                    </a>
+                  </th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for city in cities %}
+                <tr>
+                  <td class="dtr-hidden" style="display:none;"></td>
+                  <td><span class="text-nowrap text-heading">{{ city.name }}</span></td>
+                  <td><span class="text-nowrap">{{ city.region|default:"—" }}</span></td>
+                  <td><span class="text-nowrap">{{ city.country }}</span></td>
+                  <td>
+                    {% if city.is_active %}
+                      <span class="badge rounded-pill bg-label-success">Активен</span>
+                    {% else %}
+                      <span class="badge rounded-pill bg-label-danger">Неактивен</span>
+                    {% endif %}
+                  </td>
+                  <td><span class="text-nowrap">{{ city.created_at|date:"d M Y, H:i" }}</span></td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span class="text-nowrap">
+                        <a href="{% url 'cities:edit_city' city.id %}" class="btn btn-icon btn-text-secondary rounded-pill me-1" title="Редактировать">
+                          <i class="icon-base ri ri-edit-box-line icon-22px"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-icon btn-text-secondary rounded-pill text-body waves-effect btn-delete-city"
+                                data-city-id="{{ city.id }}" data-city-name="{{ city.name }}" title="Удалить">
+                          <i class="icon-base ri ri-delete-bin-7-line icon-22px"></i>
+                        </button>
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-5">Города не найдены</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mx-3 justify-content-between">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+            <div class="dt-info" aria-live="polite" id="DataTables_Table_0_info" role="status">
+              {% if cities.paginator %}
+                Showing {{ cities.start_index }} to {{ cities.end_index }} of {{ cities.paginator.count }} entries
+              {% else %}
+                Showing 1 to {{ cities|length }} of {{ cities|length }} entries
+              {% endif %}
+            </div>
+          </div>
+          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+            <div class="dt-paging">
+              {% if cities.has_other_pages %}
+              <nav aria-label="pagination">
+                <ul class="pagination">
+                  <li class="dt-paging-button page-item {% if not cities.has_previous %}disabled{% endif %}">
+                    <a class="page-link first" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="First"><i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item {% if not cities.has_previous %}disabled{% endif %}">
+                    <a class="page-link previous" href="?page={{ cities.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Previous"><i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item active"><span class="page-link">{{ cities.number }}</span></li>
+                  <li class="dt-paging-button page-item {% if not cities.has_next %}disabled{% endif %}">
+                    <a class="page-link next" href="?page={{ cities.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Next"><i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item {% if not cities.has_next %}disabled{% endif %}">
+                    <a class="page-link last" href="?page={{ cities.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Last"><i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i></a>
+                  </li>
+                </ul>
+              </nav>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div class="modal fade" id="deleteCityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подтверждение удаления</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Удалить город <strong id="delete-city-name"></strong>? Это действие нельзя отменить.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">Удалить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const modalEl = document.getElementById('deleteCityModal');
+    const nameEl = document.getElementById('delete-city-name');
+    const confirmBtn = document.getElementById('confirm-delete-btn');
+    let currentCityId = null;
+
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('.btn-delete-city');
+      if (!btn) return;
+      currentCityId = btn.getAttribute('data-city-id');
+      nameEl.textContent = btn.getAttribute('data-city-name') || '';
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    });
+
+    confirmBtn.addEventListener('click', function() {
+      if (!currentCityId) return;
+      const url = `/cities/delete/${currentCityId}/`;
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      }).then(r => r.json())
+        .then(data => {
+          if (data.status === 'success') {
+            // remove row or reload
+            const row = document.querySelector(`[data-city-id="${currentCityId}"]`)?.closest('tr');
+            if (row) row.remove();
+            else window.location.reload();
+            bootstrap.Modal.getInstance(modalEl).hide();
+          } else {
+            alert(data.message || 'Ошибка удаления');
+          }
+        })
+        .catch(() => alert('Сетевая ошибка'));
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('dt-search-0');
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const searchValue = this.value;
+        const url = new URL(window.location);
+        if (searchValue) {
+          url.searchParams.set('search', searchValue);
+        } else {
+          url.searchParams.delete('search');
+        }
+        url.searchParams.delete('page'); // Reset to first page
+        window.location.href = url.toString();
+      }
+    });
+  })();
+  </script>
+{% endblock %}

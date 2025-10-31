@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card mb-4">
+        <h5 class="card-header d-flex justify-content-between align-items-center">
+          <span>Изменение клиента</span>
+          <a href="{% url 'clients:clients_list' %}" class="btn btn-label-secondary">
+            <span class="tf-icons bx bx-arrow-back"></span> Назад
+          </a>
+        </h5>
+
+        <div class="card-body">
+          <div class="mb-4">
+            <label class="form-label d-block">Тип клиента</label>
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="client_type_switch" id="individual" value="individual" {% if client.client_type == 'individual' %}checked{% endif %} disabled>
+              <label class="btn btn-outline-primary" for="individual">
+                <i class="bx bx-user me-1"></i> Физическое лицо
+              </label>
+              
+              <input type="radio" class="btn-check" name="client_type_switch" id="legal_entity" value="legal_entity" {% if client.client_type == 'legal_entity' %}checked{% endif %} disabled>
+              <label class="btn btn-outline-primary" for="legal_entity">
+                <i class="bx bx-building me-1"></i> Юридическое лицо
+              </label>
+            </div>
+          </div>
+
+          <!-- Форма для физического лица -->
+          <form id="individual_form" method="post" class="animate__animated animate__fadeIn {% if client.client_type != 'individual' %}d-none{% endif %}">
+            {% csrf_token %}
+            <input type="hidden" name="client_type" value="individual">
+
+            <div class="nav-align-top mb-4">
+              <ul class="nav nav-tabs nav-fill" role="tablist">
+                <li class="nav-item">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#personal" aria-controls="personal" aria-selected="true">
+                    <i class="tf-icons bx bx-user"></i> Персональные данные
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#address" aria-controls="address" aria-selected="false">
+                    <i class="tf-icons bx bx-map"></i> Адресные данные
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#transport" aria-controls="transport" aria-selected="false">
+                    <i class="tf-icons bx bx-car"></i> Транспортные данные
+                  </button>
+                </li>
+              </ul>
+
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Имя</label>
+                      <input type="text" name="first_name" maxlength="100" class="form-control" required value="{{ client.individual_data.first_name|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Фамилия</label>
+                      <input type="text" name="last_name" maxlength="100" class="form-control" required value="{{ client.individual_data.last_name|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Отчество</label>
+                      <input type="text" name="middle_name" maxlength="100" class="form-control" value="{{ client.individual_data.middle_name|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Пол</label>
+                      <select name="gender" class="form-select">
+                        <option value="" {% if not client.individual_data.gender %}selected{% endif %}>---------</option>
+                        <option value="male" {% if client.individual_data.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if client.individual_data.gender == 'female' %}selected{% endif %}>Female</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Дата рождения</label>
+                      <input type="date" name="birth_date" class="form-control" value="{{ client.individual_data.birth_date|date:'Y-m-d' }}">
+                    </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Email</label>
+                       <input type="email" name="email" maxlength="320" class="form-control" value="{{ client.email|default_if_none:'' }}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Основной телефон</label>
+                       <input type="tel" name="phone" class="form-control" placeholder="+7 (___) ___-__-__" value="{% if client.phones.first %}{{ client.phones.first.phone }}{% endif %}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Доп. телефон</label>
+                       <input type="tel" name="phone2" class="form-control" placeholder="+7 (___) ___-__-__" value="{% if client.phones.all.1 %}{{ client.phones.all.1.phone }}{% endif %}">
+                     </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade" id="address" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Город</label>
+                      <select name="city" class="form-select">
+                        <option value="">Выберите город</option>
+                        {% for city in cities %}
+                        <option value="{{ city.id }}" {% if form.city.value == city.id %}selected{% endif %}>{{ city.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Адрес</label>
+                      <textarea name="address" class="form-control" rows="3" placeholder="Введите адрес">{{ client.addresses.first.address|default_if_none:'' }}</textarea>
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Комментарий к адресу</label>
+                      <input type="text" name="address_comment" class="form-control" placeholder="Комментарий к адресу" value="{{ client.addresses.first.comment|default_if_none:'' }}">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade" id="transport" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Марка автомобиля</label>
+                      <input type="text" name="car_brand" class="form-control" placeholder="Введите марку" value="{{ client.cars.first.brand|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Модель автомобиля</label>
+                      <input type="text" name="car_model" class="form-control" placeholder="Введите модель" value="{{ client.cars.first.model|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Год выпуска</label>
+                      <input type="number" name="car_year" class="form-control" placeholder="Введите год" value="{{ client.cars.first.year|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Гос. номер</label>
+                      <input type="text" name="license_plate" class="form-control" placeholder="Введите гос. номер" value="{{ client.cars.first.license_plate|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">VIN номер</label>
+                      <input type="text" name="vin_number" class="form-control" placeholder="Введите VIN" value="{{ client.cars.first.vin_number|default_if_none:'' }}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary me-2">
+                <span class="tf-icons bx bx-save"></span> Сохранить изменения
+              </button>
+              <a href="{% url 'clients:clients_list' %}" class="btn btn-label-secondary">
+                <span class="tf-icons bx bx-arrow-back"></span> Отмена
+              </a>
+            </div>
+          </form>
+
+          <!-- Форма для юридического лица -->
+          <form id="legal_entity_form" method="post" class="animate__animated animate__fadeIn {% if client.client_type != 'legal_entity' %}d-none{% endif %}">
+            {% csrf_token %}
+            <input type="hidden" name="client_type" value="legal_entity">
+
+            <div class="nav-align-top mb-4">
+              <ul class="nav nav-tabs nav-fill" role="tablist">
+                <li class="nav-item">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#company" aria-controls="company" aria-selected="true">
+                    <i class="tf-icons bx bx-building"></i> Данные компании
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#legal-address" aria-controls="legal-address" aria-selected="false">
+                    <i class="tf-icons bx bx-map"></i> Адресные данные
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#bank" aria-controls="bank" aria-selected="false">
+                    <i class="tf-icons bx bx-credit-card"></i> Банковские реквизиты
+                  </button>
+                </li>
+              </ul>
+
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="company" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Название компании</label>
+                      <input type="text" name="company_name" maxlength="255" class="form-control" required value="{{ client.legal_entity_data.company_name|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">БИН</label>
+                      <input type="text" name="bin" maxlength="12" class="form-control" value="{{ client.legal_entity_data.bin|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">ИИК</label>
+                      <input type="text" name="tax_number" maxlength="12" class="form-control" value="{{ client.legal_entity_data.tax_number|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Дата регистрации</label>
+                      <input type="date" name="registration_date" class="form-control" value="{{ client.legal_entity_data.registration_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">ФИО директора</label>
+                      <input type="text" name="director_name" maxlength="255" class="form-control" value="{{ client.legal_entity_data.director_name|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Расчетный счет</label>
+                      <input type="text" name="bank_account" maxlength="50" class="form-control" value="{{ client.legal_entity_data.bank_account|default_if_none:'' }}">
+                    </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Наименование банка</label>
+                       <input type="text" name="bank_name" maxlength="255" class="form-control" value="{{ client.legal_entity_data.bank_name|default_if_none:'' }}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Email</label>
+                       <input type="email" name="email" maxlength="320" class="form-control" value="{{ client.email|default_if_none:'' }}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Основной телефон</label>
+                       <input type="tel" name="phone" class="form-control" placeholder="+7 (___) ___-__-__" value="{% if client.phones.first %}{{ client.phones.first.phone }}{% endif %}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                       <label class="form-label">Доп. телефон</label>
+                       <input type="tel" name="phone2" class="form-control" placeholder="+7 (___) ___-__-__" value="{% if client.phones.all.1 %}{{ client.phones.all.1.phone }}{% endif %}">
+                     </div>
+
+                  </div>
+                </div>
+
+                <div class="tab-pane fade" id="legal-address" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Город</label>
+                      <select name="city" class="form-select">
+                        <option value="">Выберите город</option>
+                        {% for city in cities %}
+                        <option value="{{ city.id }}" {% if form.city.value == city.id %}selected{% endif %}>{{ city.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Адрес</label>
+                      <textarea name="address" class="form-control" rows="3" placeholder="Введите адрес">{{ client.addresses.first.address|default_if_none:'' }}</textarea>
+                    </div>
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Комментарий к адресу</label>
+                      <input type="text" name="address_comment" class="form-control" placeholder="Комментарий к адресу" value="{{ client.addresses.first.comment|default_if_none:'' }}">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-pane fade" id="bank" role="tabpanel">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Расчетный счет</label>
+                      <input type="text" name="bank_account" maxlength="50" class="form-control" value="{{ client.legal_entity_data.bank_account|default_if_none:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Наименование банка</label>
+                      <input type="text" name="bank_name" maxlength="255" class="form-control" value="{{ client.legal_entity_data.bank_name|default_if_none:'' }}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button type="submit" class="btn btn-primary me-2">
+                <span class="tf-icons bx bx-save"></span> Сохранить изменения
+              </button>
+              <a href="{% url 'clients:clients_list' %}" class="btn btn-label-secondary">
+                <span class="tf-icons bx bx-arrow-back"></span> Отмена
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const individualRadio = document.getElementById('individual');
+    const legalRadio = document.getElementById('legal_entity');
+    const individualForm = document.getElementById('individual_form');
+    const legalForm = document.getElementById('legal_entity_form');
+
+    function toggleForms() {
+      if (individualRadio.checked) {
+        individualForm.classList.remove('d-none');
+        legalForm.classList.add('d-none');
+      } else {
+        individualForm.classList.add('d-none');
+        legalForm.classList.remove('d-none');
+      }
+    }
+
+    individualRadio.addEventListener('change', toggleForms);
+    legalRadio.addEventListener('change', toggleForms);
+    toggleForms();
+
+    function hookAjax(form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        // Собираем данные из всех полей формы, включая скрытые вкладки
+        const formData = new FormData();
+        
+        // Собираем все input, select, textarea элементы из формы
+        const allInputs = form.querySelectorAll('input, select, textarea');
+        allInputs.forEach(input => {
+          if (input.type === 'radio' || input.type === 'checkbox') {
+            if (input.checked) {
+              formData.append(input.name, input.value);
+            }
+          } else {
+            formData.append(input.name, input.value);
+          }
+        });
+        
+        fetch(window.location.href, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData
+        }).then(r => r.json())
+          .then(data => {
+            if (data.status === 'success') {
+              if (window.showNotification) {
+                window.showNotification(data.message || 'Изменения сохранены', 'success');
+              }
+              setTimeout(() => {
+                window.location.href = data.redirect_url;
+              }, 1000);
+            } else {
+              if (window.showNotification) {
+                window.showNotification(data.message || 'Ошибка. Проверьте форму.', 'error');
+              }
+              console.error(data.errors || data);
+            }
+          })
+          .catch(err => {
+            if (window.showNotification) {
+              window.showNotification('Сетевая ошибка', 'error');
+            }
+            console.error(err);
+          });
+      });
+    }
+
+    hookAjax(individualForm);
+    hookAjax(legalForm);
+  });
+</script>
+{% endblock %}
+
+

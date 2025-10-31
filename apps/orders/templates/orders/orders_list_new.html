@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load order_extras %}
+
+{% block title %}Заказы - CRM{% endblock %}
+
+{% block extra_css %}
+<!-- Стили вынесены в static/frontend/assets/css/demo.css -->
+{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-6">
+    <h4 class="mb-0">Список заказов</h4>
+    <a href="{% url 'orders:add_order' %}" class="btn btn-primary">
+      <i class="icon-base ri ri-add-line me-1"></i>
+      Создать заказ
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <!-- Пагинация сверху -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+          <span class="me-3">Показать:</span>
+          <select name="per_page" class="form-select form-select-sm" style="width: auto;" onchange="changePerPage(this.value)">
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+          </select>
+          <span class="ms-3 text-muted">
+            Показано {{ orders.start_index }}-{{ orders.end_index }} из {{ orders.paginator.count }} записей
+          </span>
+        </div>
+      </div>
+
+      <!-- Горизонтальная прокрутка над заголовком -->
+      <div class="table-scroll-top-wrapper">
+        <div class="table-scroll-top">
+          <div class="scroll-content"></div>
+        </div>
+      </div>
+
+      <!-- Таблица заказов -->
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead class="sticky-top">
+            <tr>
+              <th style="min-width: 80px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Действия
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 100px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  ID заказа
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 150px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Статус
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Дата создания
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Ответственный
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Телефон
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 300px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Номенклатура
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 100px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Клиент
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  ФИО (ТОО)
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Город клиента
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 100px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Код товара
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 100px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Сегмент
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 100px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Цена
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 80px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Кол-во
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Сумма
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Город филиал
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Откуда заказ
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Способ оплаты
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Способ доставки
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 80px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  По акции
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+              <th style="min-width: 120px;">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted" style="font-size: 12px;"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted" style="font-size: 12px;"></i>
+                  Комментарий
+                </div>
+                <div class="resize-handle"></div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              {% for item in order.items.all %}
+                <tr class="status-{{ order.status|status_css_class }}" data-status="{{ order.status }}" data-css-class="{{ order.status|status_css_class }}">
+                  {% if forloop.first %}
+                    <td rowspan="{{ order.items.count }}">
+                      <a href="{% url 'orders:edit_order' order.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="ri-edit-line"></i>
+                      </a>
+                    </td>
+                    <td rowspan="{{ order.items.count }}">{{ order.order_number }}</td>
+                    <td rowspan="{{ order.items.count }}">
+                      <h6 class="mb-0 align-items-center d-flex w-px-100 {{ order.status|status_text_class }}">
+                        <i class="icon-base ri ri-circle-fill icon-10px me-1"></i>{{ order.get_status_display }}
+                      </h6>
+                    </td>
+                    <td rowspan="{{ order.items.count }}">{{ order.created_at|date:"d.m.Y" }}</td>
+                    <td rowspan="{{ order.items.count }}">
+                      {% if order.responsible.last_name %}
+                        {{ order.responsible.last_name }} {{ order.responsible.first_name|slice:":1" }}.{% if order.responsible.middle_name %}{{ order.responsible.middle_name|slice:":1" }}.{% endif %}
+                      {% else %}
+                        {{ order.responsible.username }}
+                      {% endif %}
+                    </td>
+                    <td rowspan="{{ order.items.count }}">{{ order.client.phones.first.phone_number }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td rowspan="{{ order.items.count }}">
+                      {% if order.client.client_type == 'individual' %}
+                        <i class="ri-user-line text-success"></i>
+                      {% else %}
+                        <i class="ri-user-2-line text-danger"></i>
+                      {% endif %}
+                    </td>
+                    <td rowspan="{{ order.items.count }}">
+                      {% if order.client.client_type == 'individual' %}
+                        {% if order.client.individual_data %}
+                          {{ order.client.individual_data.last_name }} {{ order.client.individual_data.first_name }} {{ order.client.individual_data.middle_name }}
+                        {% endif %}
+                      {% else %}
+                        {% if order.client.legal_entity_data %}
+                          {{ order.client.legal_entity_data.company_name }}
+                        {% endif %}
+                      {% endif %}
+                    </td>
+                    <td rowspan="{{ order.items.count }}">{{ order.client.addresses.first.city.name }}</td>
+                    <td>{{ item.product_code }}</td>
+                    <td>{{ item.segment }}</td>
+                    <td>{{ item.price|spaced_thousands }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total|spaced_thousands }}</td>
+                    <td>{{ item.branch_city }}</td>
+                    <td rowspan="{{ order.items.count }}">{{ order.get_source_display }}</td>
+                    <td rowspan="{{ order.items.count }}">{{ order.get_payment_method_display }}</td>
+                    <td rowspan="{{ order.items.count }}">{{ order.get_delivery_method_display }}</td>
+                    <td rowspan="{{ order.items.count }}">
+                      {% if order.promo %}
+                        <i class="ri-check-line text-success"></i>
+                      {% else %}
+                        <i class="ri-close-line text-muted"></i>
+                      {% endif %}
+                    </td>
+                    <td rowspan="{{ order.items.count }}">{{ order.notes|default:"" }}</td>
+                  {% else %}
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.product_code }}</td>
+                    <td>{{ item.segment }}</td>
+                    <td>{{ item.price|spaced_thousands }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.total|spaced_thousands }}</td>
+                    <td>{{ item.branch_city }}</td>
+                  {% endif %}
+                </tr>
+              {% empty %}
+                <tr class="status-{{ order.status|status_css_class }}" data-status="{{ order.status }}" data-css-class="{{ order.status|status_css_class }}">
+                  <td>
+                    <a href="{% url 'orders:edit_order' order.id %}" class="btn btn-sm btn-outline-primary">
+                      <i class="ri-edit-line"></i>
+                    </a>
+                  </td>
+                  <td>{{ order.order_number }}</td>
+                  <td>
+                    <h6 class="mb-0 align-items-center d-flex w-px-100 {{ order.status|status_text_class }}">
+                      <i class="icon-base ri ri-circle-fill icon-10px me-1"></i>{{ order.get_status_display }}
+                    </h6>
+                  </td>
+                  <td>{{ order.created_at|date:"d.m.Y" }}</td>
+                  <td>
+                    {% if order.responsible.last_name %}
+                      {{ order.responsible.last_name }} {{ order.responsible.first_name|slice:":1" }}.{% if order.responsible.middle_name %}{{ order.responsible.middle_name|slice:":1" }}.{% endif %}
+                    {% else %}
+                      {{ order.responsible.username }}
+                    {% endif %}
+                  </td>
+                  <td>{{ order.client.phones.first.phone_number }}</td>
+                  <td colspan="6"></td>
+                  <td>
+                    {% if order.client.client_type == 'individual' %}
+                      <i class="ri-user-line text-success"></i>
+                    {% else %}
+                      <i class="ri-user-2-line text-danger"></i>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if order.client.client_type == 'individual' %}
+                      {% if order.client.individual_data %}
+                        {{ order.client.individual_data.last_name }} {{ order.client.individual_data.first_name }} {{ order.client.individual_data.middle_name }}
+                      {% endif %}
+                    {% else %}
+                      {% if order.client.legal_entity_data %}
+                        {{ order.client.legal_entity_data.company_name }}
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                  <td>{{ order.client.addresses.first.city.name }}</td>
+                  <td colspan="3"></td>
+                  <td>{{ order.get_source_display }}</td>
+                  <td>{{ order.get_payment_method_display }}</td>
+                  <td>{{ order.get_delivery_method_display }}</td>
+                  <td>
+                    {% if order.promo %}
+                      <i class="ri-check-line text-success"></i>
+                    {% else %}
+                      <i class="ri-close-line text-muted"></i>
+                    {% endif %}
+                  </td>
+                  <td>{{ order.notes|default:"" }}</td>
+                </tr>
+              {% endfor %}
+            {% empty %}
+              <tr>
+                <td colspan="20" class="text-center text-muted py-4">
+                  <i class="ri-inbox-line me-2"></i>
+                  Заказы не найдены
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Пагинация внизу -->
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if orders.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if per_page %}&per_page={{ per_page }}{% endif %}">Первая</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ orders.previous_page_number }}{% if per_page %}&per_page={{ per_page }}{% endif %}">Предыдущая</a>
+            </li>
+          {% endif %}
+
+          {% for num in orders.paginator.page_range %}
+            {% if num == orders.number %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > orders.number|add:'-3' and num < orders.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{ per_page }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if orders.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ orders.next_page_number }}{% if per_page %}&per_page={{ per_page }}{% endif %}">Следующая</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ orders.paginator.num_pages }}{% if per_page %}&per_page={{ per_page }}{% endif %}">Последняя</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+function changePerPage(value) {
+  const url = new URL(window.location);
+  url.searchParams.set('per_page', value);
+  url.searchParams.set('page', '1');
+  window.location.href = url.toString();
+}
+</script>
+
+<!-- JavaScript вынесен в static/frontend/assets/js/orders-list.js -->
+<script src="{% static 'frontend/assets/js/orders-list.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,528 @@
+/*
+* demo.css
+* File include item demo only specific css only
+******************************************************************************/
+
+.menu .app-brand.demo {
+  height: 64px;
+}
+
+.app-brand-logo.demo svg {
+  width: 30px;
+  height: 24px;
+}
+
+.app-brand-text.demo {
+  font-size: 1.25rem;
+}
+
+.authentication-wrapper .app-brand-text.demo {
+  font-size: 1.5rem;
+  text-transform: capitalize;
+}
+
+/* ! For .layout-navbar-fixed added fix padding top to .layout-page */
+/* Default navbar */
+.layout-navbar-fixed .layout-wrapper:not(.layout-without-menu) .layout-page {
+  padding-top: 64px !important;
+}
+
+/* Navbar page z-index issue solution */
+.content-wrapper .navbar {
+  z-index: auto;
+}
+
+/*
+* Content
+******************************************************************************/
+
+.demo-blocks > * {
+  display: block !important;
+}
+
+.demo-inline-spacing > * {
+  margin: 1rem 0.375rem 0 0 !important;
+}
+
+/* ? .demo-vertical-spacing class is used to have vertical margins between elements. To remove margin-top from the first-child, use .demo-only-element class with .demo-vertical-spacing class. For example, we have used this class in forms-input-groups.html file. */
+.demo-vertical-spacing > * {
+  margin-top: 1.25rem !important;
+  margin-bottom: 0 !important;
+}
+.demo-vertical-spacing.demo-only-element > :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-lg > * {
+  margin-top: 1.875rem !important;
+  margin-bottom: 0 !important;
+}
+.demo-vertical-spacing-lg.demo-only-element > :first-child {
+  margin-top: 0 !important;
+}
+
+.demo-vertical-spacing-xl > * {
+  margin-top: 5rem !important;
+  margin-bottom: 0 !important;
+}
+.demo-vertical-spacing-xl.demo-only-element > :first-child {
+  margin-top: 0 !important;
+}
+
+/* Dropdown buttons going out of small screens */
+@media (max-width: 576px) {
+  #dropdown-variation-demo .btn-group .text-truncate {
+    width: 300px;
+    position: relative;
+  }
+  #dropdown-variation-demo .btn-group .text-truncate::after {
+    position: absolute;
+    top: 45%;
+    right: 0.65rem;
+  }
+}
+/*
+* Layout demo
+******************************************************************************/
+
+.layout-demo-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin-top: 1.25rem;
+}
+.layout-demo-placeholder img {
+  width: 900px;
+}
+.layout-demo-info {
+  text-align: center;
+  margin-top: 1.25rem;
+}
+
+/* Tables: tighten vertical padding for compact rows */
+/* Bootstrap 5 table cell selector */
+.table > :not(caption) > * > * {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+/* Fallback for generic table cells */
+.table td,
+.table th {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+/* DataTables integration */
+table.dataTable tbody th,
+table.dataTable tbody td,
+table.dataTable thead th,
+table.dataTable thead td {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+/*
+* Orders List Styles
+******************************************************************************/
+
+/* Стили для таблицы заказов */
+.table-responsive {
+  height: 70vh !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  display: block !important;
+}
+
+.table-responsive table {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+.table-responsive thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  border-bottom: 2px solid #dee2e6 !important;
+}
+
+/* Горизонтальная прокрутка над заголовком */
+.table-scroll-top-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-bottom: 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-scroll-top {
+  height: 20px;
+  min-width: 100%;
+}
+
+.scroll-content {
+  height: 1px;
+  min-width: 100%;
+}
+
+/* Кастомные скроллбары */
+.table-responsive::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.table-responsive::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* Firefox скроллбары */
+.table-responsive {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Изменение размера столбцов */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.resize-handle:hover {
+  background: #007bff;
+}
+
+.table th {
+  position: relative;
+}
+
+/* Стили для статусов в стиле Materio */
+.status-display {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.status-display .icon-base {
+  font-size: 10px;
+  margin-right: 0.25rem;
+}
+
+/* Убираем старые стили badge */
+.badge.badge-status {
+  display: none;
+}
+
+/* Стили для иконок статусов */
+.icon-10px {
+  font-size: 10px !important;
+}
+
+.w-px-100 {
+  width: auto !important;
+  min-width: 150px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  line-height: 1.3 !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* Дополнительные стили для статусов */
+h6.w-px-100 {
+  width: auto !important;
+  min-width: 150px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  line-height: 1.3 !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* Стили для ячейки со статусом */
+.table td:nth-child(3) {
+  width: auto !important;
+  min-width: 150px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  padding: 0.5rem !important;
+}
+
+/* Максимально специфичные стили для статусов */
+.table tbody tr td:nth-child(3) h6.w-px-100 {
+  width: auto !important;
+  min-width: 150px !important;
+  max-width: none !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  height: 100% !important;
+  min-height: 40px !important;
+  line-height: 1.3 !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+.table tbody tr td:nth-child(3) h6.w-px-100 i {
+  display: inline-block !important;
+  margin-right: 0.25rem !important;
+  vertical-align: middle !important;
+}
+
+.table tbody tr td:nth-child(3) h6.w-px-100 span {
+  display: inline !important;
+}
+
+/* Ширина столбца Номенклатура */
+.table th:nth-child(7),
+.table td:nth-child(7) {
+  min-width: 300px !important;
+  width: 300px !important;
+}
+
+/* Цветовые схемы для статусов заказов - только если включены цветные строки */
+body.colored-order-rows .table tbody tr.status-new {
+  background-color: #C8FACC !important;
+}
+
+body.colored-order-rows .table tbody tr.status-new-paid {
+  background-color: #C8FACC !important;
+}
+
+body.colored-order-rows .table tbody tr.status-reserve {
+  background-color: #FFF3CD !important;
+}
+
+body.colored-order-rows .table tbody tr.status-transfer {
+  background-color: #D1ECF1 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-delivery {
+  background-color: #D4EDDA !important;
+}
+
+body.colored-order-rows .table tbody tr.status-callback {
+  background-color: #FFF3CD !important;
+}
+
+body.colored-order-rows .table tbody tr.status-completed {
+  background-color: #C8FACC !important;
+}
+
+body.colored-order-rows .table tbody tr.status-refund {
+  background-color: #D1ECF1 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled {
+  background-color: #F8D7DA !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-no-answer {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-not-suitable-year {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-wrong-order {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-found-other {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-delivery-terms {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-no-quantity {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancel-incomplete {
+  background-color: #FF3333 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-no-set {
+  background-color: #FF3333 !important;
+}
+
+/* Если цветные строки отключены - все строки белые в светлой теме */
+body:not(.colored-order-rows) .table tbody tr {
+  background-color: #ffffff !important;
+}
+
+/* Темная тема для цветных строк */
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-new {
+  background-color: rgba(26, 35, 126, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-new-paid {
+  background-color: rgba(26, 35, 126, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-reserve {
+  background-color: rgba(255, 193, 7, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-transfer {
+  background-color: rgba(23, 162, 184, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-delivery {
+  background-color: rgba(40, 167, 69, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-callback {
+  background-color: rgba(255, 193, 7, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-completed {
+  background-color: rgba(26, 35, 126, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-refund {
+  background-color: rgba(23, 162, 184, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled {
+  background-color: rgba(220, 53, 69, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-no-answer {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-not-suitable-year {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-wrong-order {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-found-other {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-delivery-terms {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-no-quantity {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancel-incomplete {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-set {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+/* Темная тема для таблиц */
+[data-theme="dark"] .table {
+  --bs-table-bg: var(--bs-card-bg);
+  --bs-table-color: var(--bs-body-color);
+  --bs-table-border-color: var(--bs-border-color);
+  background-color: var(--bs-card-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table th {
+  background-color: var(--bs-card-bg) !important;
+  color: var(--bs-body-color) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > td,
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > th {
+  --bs-table-accent-bg: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Компактный режим */
+body.compact-mode .table td,
+body.compact-mode .table th {
+  padding: 0.25rem 0.5rem !important;
+}
+
+body.compact-mode .card-body {
+  padding: 1rem !important;
+}
+
+body.compact-mode .btn {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+}
+
+body.compact-mode .form-floating {
+  margin-bottom: 0.5rem !important;
+}
+
+/* Стили для стрелок сортировки */
+.sort-arrow {
+  pointer-events: auto !important;
+  z-index: 10 !important;
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.sort-arrow:hover {
+  color: var(--bs-primary) !important;
+  transform: scale(1.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Убираем перекрытие стрелок другими элементами */
+.table th .d-flex {
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+.table th .resize-handle {
+  z-index: 1 !important;
+}

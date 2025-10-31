@@ -1,0 +1,1072 @@
+{% load static %}
+<html lang="ru" class="layout-menu-fixed layout-compact" data-template="vertical-menu-template-free" data-assets-path="{% static 'frontend/assets/' %}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>{% block title %}CRM{% endblock %}</title>
+    <meta name="description" content="">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'frontend/assets/img/favicon/favicon.ico' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/fonts/iconify-icons.css' %}">
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/libs/node-waves/node-waves.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/css/core.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/css/demo.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/fonts/remixicon.css' %}">
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/libs/apex-charts/apex-charts.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/css/datatables/datatables.bootstrap5.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/css/datatables/buttons.bootstrap5.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/assets/vendor/css/datatables/responsive.bootstrap5.css' %}">
+
+    {% block styles %}{% endblock %}
+
+    <!-- Global Settings Styles -->
+    <style>
+      /* Темная тема */
+      [data-theme="dark"] {
+        --bs-body-bg: #1a1a1a;
+        --bs-body-color: #ffffff;
+        --bs-card-bg: #2d2d2d;
+        --bs-border-color: #404040;
+        --bs-secondary-bg: #3d3d3d;
+        --bs-tertiary-bg: #555555;
+      }
+
+      [data-theme="dark"] body {
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .card {
+        background-color: var(--bs-card-bg) !important;
+        border-color: var(--bs-border-color) !important;
+      }
+
+      [data-theme="dark"] .form-control,
+      [data-theme="dark"] .form-select {
+        background-color: var(--bs-secondary-bg) !important;
+        border-color: var(--bs-tertiary-bg) !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .form-control:focus,
+      [data-theme="dark"] .form-select:focus {
+        background-color: var(--bs-secondary-bg) !important;
+        border-color: #007bff !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .btn-outline-secondary {
+        border-color: var(--bs-tertiary-bg) !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .btn-outline-secondary:hover {
+        background-color: var(--bs-tertiary-bg) !important;
+        border-color: var(--bs-tertiary-bg) !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .text-body-secondary {
+        color: #aaaaaa !important;
+      }
+
+      [data-theme="dark"] .border {
+        border-color: var(--bs-border-color) !important;
+      }
+
+      [data-theme="dark"] .form-check-input:checked {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+      }
+
+      [data-theme="dark"] .form-check-input {
+        background-color: var(--bs-secondary-bg) !important;
+        border-color: var(--bs-tertiary-bg) !important;
+      }
+
+      [data-theme="dark"] .table {
+        --bs-table-bg: var(--bs-card-bg);
+        --bs-table-color: var(--bs-body-color);
+        --bs-table-border-color: var(--bs-border-color);
+        background-color: var(--bs-card-bg) !important;
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .table td,
+      [data-theme="dark"] .table th {
+        background-color: var(--bs-card-bg) !important;
+        color: var(--bs-body-color) !important;
+        border-color: var(--bs-border-color) !important;
+      }
+
+      [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > td,
+      [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > th {
+        --bs-table-accent-bg: rgba(255, 255, 255, 0.05);
+        background-color: rgba(255, 255, 255, 0.05) !important;
+      }
+
+      [data-theme="dark"] .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+      }
+
+      [data-theme="dark"] .navbar {
+        background-color: var(--bs-card-bg) !important;
+        border-color: var(--bs-border-color) !important;
+      }
+
+      [data-theme="dark"] .layout-menu {
+        background-color: var(--bs-card-bg) !important;
+        border-color: var(--bs-border-color) !important;
+      }
+
+      [data-theme="dark"] .menu-item a {
+        color: var(--bs-body-color) !important;
+      }
+
+      [data-theme="dark"] .menu-item a:hover {
+        background-color: var(--bs-secondary-bg) !important;
+      }
+
+      [data-theme="dark"] .menu-item.active > a {
+        background-color: #007bff !important;
+        color: white !important;
+      }
+
+      /* Компактный режим */
+      body.compact-mode .table td,
+      body.compact-mode .table th {
+        padding: 0.25rem 0.5rem !important;
+      }
+
+      body.compact-mode .card-body {
+        padding: 1rem !important;
+      }
+
+      body.compact-mode .btn {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.875rem !important;
+      }
+
+      body.compact-mode .form-floating {
+        margin-bottom: 0.5rem !important;
+      }
+
+      /* Цветные строки заказов - только если включены цветные строки */
+      body.colored-order-rows .table tbody tr.status-new {
+        background-color: #C8FACC !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-new-paid {
+        background-color: #A6F3B5 !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-reserve {
+        background-color: #FFF5B1 !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-transfer {
+        background-color: #FFE79E !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-delivery {
+        background-color: #FFD47E !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-callback {
+        background-color: #FFBD6A !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-completed {
+        background-color: #B8E6FF !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-refund {
+        background-color: #9CD2FF !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled {
+        background-color: #FFBDBD !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-no-call {
+        background-color: #FFCCCC !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-year {
+        background-color: #FFB3B3 !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-wrong {
+        background-color: #FF9999 !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-found-other {
+        background-color: #FF8080 !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-delivery {
+        background-color: #FF6666 !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-no-quantity {
+        background-color: #FF4D4D !important;
+      }
+
+      body.colored-order-rows .table tbody tr.status-cancelled-no-set {
+        background-color: #FF3333 !important;
+      }
+
+      /* Если цветные строки отключены - все строки белые в светлой теме */
+      body:not(.colored-order-rows) .table tbody tr {
+        background-color: #ffffff !important;
+      }
+
+      /* В темной теме строки должны быть темными */
+      [data-theme="dark"] body:not(.colored-order-rows) .table tbody tr {
+        background-color: var(--bs-card-bg) !important;
+      }
+
+      /* Темная тема для цветных строк */
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-new {
+        background-color: rgba(26, 35, 126, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-new-paid {
+        background-color: rgba(27, 94, 32, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-reserve {
+        background-color: rgba(230, 81, 0, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-transfer {
+        background-color: rgba(74, 20, 140, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-delivery {
+        background-color: rgba(27, 94, 32, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-callback {
+        background-color: rgba(183, 28, 28, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-completed {
+        background-color: rgba(136, 14, 79, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-refund {
+        background-color: rgba(245, 127, 23, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled {
+        background-color: rgba(0, 105, 92, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-call {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-year {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-wrong {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-found-other {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-delivery {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-quantity {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+
+      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-set {
+        background-color: rgba(51, 105, 30, 0.3) !important;
+      }
+    </style>
+
+    <!-- Custom menu styles -->
+    <style>
+      .menu-sub {
+        display: none;
+        padding-left: 1rem;
+      }
+      
+      .menu-item.open .menu-sub {
+        display: block;
+      }
+      
+      .menu-toggle::after {
+        content: '\ea6e';
+        font-family: 'remixicon';
+        float: right;
+        transition: transform 0.3s ease;
+      }
+      
+      .menu-item.open .menu-toggle::after {
+        transform: rotate(90deg);
+      }
+      
+      /* Предотвращаем автоматическое закрытие dropdown */
+      .dropdown-menu {
+        pointer-events: auto;
+      }
+      
+      .dropdown-toggle:focus {
+        box-shadow: none;
+      }
+      
+      /* Убираем автоматическое закрытие при клике вне области */
+      .navbar .dropdown-menu {
+        position: absolute;
+        will-change: transform;
+      }
+    </style>
+
+    <!-- Helpers -->
+    <script src="{% static 'frontend/assets/vendor/js/helpers.js' %}"></script>
+    <script src="{% static 'frontend/assets/js/config.js' %}"></script>
+  </head>
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme" data-bg-class="bg-menu-theme">
+          <div class="app-brand demo">
+            <a href="/" class="app-brand-link">
+              <span class="app-brand-logo demo me-1">
+                <span class="text-primary">CRM</span>
+              </span>
+              <span class="app-brand-text demo menu-text fw-semibold ms-2">CRM System</span>
+            </a>
+            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+              <i class="menu-toggle-icon d-xl-inline-block align-middle"></i>
+            </a>
+          </div>
+
+          <div class="menu-inner-shadow"></div>
+
+          <ul class="menu-inner py-1">
+            {% block side_menu %}
+            <li class="menu-item"><a href="{% url 'dashboard:dashboard' %}" class="menu-link"><i class="menu-icon icon-base ri ri-dashboard-3-line"></i><div>Dashboard</div></a></li>
+            <li class="menu-item"><a href="{% url 'orders:orders_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-table-alt-line"></i><div>Заказы</div></a></li>
+            <li class="menu-item"><a href="{% url 'clients:clients_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-user-line"></i><div>Клиенты</div></a></li>
+            <li class="menu-item"><a href="{% url 'products:products_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-box-3-line"></i><div>Товары</div></a></li>
+            
+            <!-- Справочники -->
+            <li class="menu-item">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon icon-base ri ri-radio-button-line"></i>
+                <div>Справочники</div>
+              </a>
+              <ul class="menu-sub">
+                <li class="menu-item">
+                  <a href="{% url 'cities:cities_list' %}" class="menu-link">
+                    <div>Города</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/order-sources/" class="menu-link">
+                    <div>Источники заказа</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/order-statuses/" class="menu-link">
+                    <div>Статусы заказов</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="/payment-methods/" class="menu-link">
+                    <div>Способы оплаты</div>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            {% endblock %}
+          </ul>
+        </aside>
+        <!-- / Menu -->
+
+        <!-- Layout container -->
+        <div class="layout-page">
+          <!-- Navbar -->
+          <nav class="layout-navbar container-xxl navbar-detached navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
+            <!-- Menu toggle -->
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
+              <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+                <i class="icon-base ri ri-menu-line icon-md"></i>
+              </a>
+            </div>
+
+            <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
+              <!-- Search -->
+              <div class="navbar-nav align-items-center">
+                <div class="nav-item navbar-search-wrapper mb-0">
+                  <a class="nav-item nav-link search-toggler px-0" href="javascript:void(0);">
+                    <span class="d-inline-block text-body-secondary fw-normal">
+                      <i class="icon-base ri ri-search-line icon-22px"></i>
+                    </span>
+                  </a>
+                </div>
+              </div>
+              <!-- /Search -->
+
+              <ul class="navbar-nav flex-row align-items-center ms-md-auto">
+                <!-- Language -->
+                <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
+                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <i class="icon-base ri ri-translate-2 icon-22px"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <a class="dropdown-item waves-effect active" href="javascript:void(0);" data-language="ru" data-text-direction="ltr">
+                        <span>Русский</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item waves-effect" href="javascript:void(0);" data-language="en" data-text-direction="ltr">
+                        <span>English</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <!--/ Language -->
+
+          <!-- Notification -->
+          <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+            <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill waves-effect" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
+              <span class="position-relative">
+                <i class="icon-base ri ri-notification-2-line icon-22px"></i>
+                <span class="badge rounded-pill bg-danger badge-dot badge-notifications border"></span>
+              </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end p-0">
+              <li class="dropdown-menu-header border-bottom">
+                <div class="dropdown-header d-flex align-items-center py-3">
+                  <h6 class="mb-0 me-auto">Уведомления</h6>
+                  <div class="d-flex align-items-center h6 mb-0">
+                    <span class="badge bg-label-primary rounded-pill me-2">3 Новых</span>
+                    <a href="javascript:void(0)" class="dropdown-notifications-all p-2" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Отметить все как прочитанные" data-bs-original-title="Отметить все как прочитанные">
+                      <i class="icon-base ri ri-mail-open-line text-heading"></i>
+                    </a>
+                  </div>
+                </div>
+              </li>
+              <li class="dropdown-notifications-list scrollable-container ps">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item list-group-item-action dropdown-notifications-item waves-effect">
+                    <div class="d-flex">
+                      <div class="flex-shrink-0 me-3">
+                        <div class="avatar">
+                          <span class="avatar-initial rounded-circle bg-label-success">НЗ</span>
+                        </div>
+                      </div>
+                      <div class="flex-grow-1">
+                        <h6 class="small mb-50">Новый заказ 📦</h6>
+                        <small class="mb-1 d-block text-body">Поступил заказ №12345 от клиента Иван Петров</small>
+                        <small class="text-body-secondary">5 мин назад</small>
+                      </div>
+                      <div class="flex-shrink-0 dropdown-notifications-actions">
+                        <a href="javascript:void(0)" class="dropdown-notifications-read"> <span class="badge badge-dot"></span></a>
+                        <a href="javascript:void(0)" class="dropdown-notifications-archive"> <span class="icon-base ri ri-close-line"></span></a>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item list-group-item-action dropdown-notifications-item waves-effect">
+                    <div class="d-flex">
+                      <div class="flex-shrink-0 me-3">
+                        <div class="avatar">
+                          <span class="avatar-initial rounded-circle bg-label-warning">СК</span>
+                        </div>
+                      </div>
+                      <div class="flex-grow-1">
+                        <h6 class="small mb-50">Смена статуса заказа</h6>
+                        <small class="mb-1 d-block text-body">Заказ №12340 переведен в статус "В обработке"</small>
+                        <small class="text-body-secondary">1 час назад</small>
+                      </div>
+                      <div class="flex-shrink-0 dropdown-notifications-actions">
+                        <a href="javascript:void(0)" class="dropdown-notifications-read"> <span class="badge badge-dot"></span></a>
+                        <a href="javascript:void(0)" class="dropdown-notifications-archive"> <span class="icon-base ri ri-close-line"></span></a>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
+                    <div class="d-flex">
+                      <div class="flex-shrink-0 me-3">
+                        <div class="avatar">
+                          <span class="avatar-initial rounded-circle bg-label-info">К</span>
+                        </div>
+                      </div>
+                      <div class="flex-grow-1">
+                        <h6 class="small mb-50">Новый клиент ✨</h6>
+                        <small class="mb-1 d-block text-body">Зарегистрирован новый клиент: ООО "ТехноМир"</small>
+                        <small class="text-body-secondary">2 часа назад</small>
+                      </div>
+                      <div class="flex-shrink-0 dropdown-notifications-actions">
+                        <a href="javascript:void(0)" class="dropdown-notifications-read"> <span class="badge badge-dot"></span></a>
+                        <a href="javascript:void(0)" class="dropdown-notifications-archive"> <span class="icon-base ri ri-close-line"></span></a>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read waves-effect">
+                    <div class="d-flex">
+                      <div class="flex-shrink-0 me-3">
+                        <div class="avatar">
+                          <span class="avatar-initial rounded-circle bg-label-danger">!</span>
+                        </div>
+                      </div>
+                      <div class="flex-grow-1">
+                        <h6 class="small mb-50">Системное уведомление</h6>
+                        <small class="mb-1 d-block text-body">Запланировано техническое обслуживание системы</small>
+                        <small class="text-body-secondary">1 день назад</small>
+                      </div>
+                      <div class="flex-shrink-0 dropdown-notifications-actions">
+                        <a href="javascript:void(0)" class="dropdown-notifications-read"> <span class="badge badge-dot"></span></a>
+                        <a href="javascript:void(0)" class="dropdown-notifications-archive"> <span class="icon-base ri ri-close-line"></span></a>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li class="dropdown-menu-footer border-top">
+                <a href="javascript:void(0);" class="dropdown-item d-flex justify-content-center text-primary p-2 h6 mb-0 waves-effect">
+                  Просмотреть все уведомления
+                </a>
+              </li>
+            </ul>
+          </li>
+          <!-- / Notification -->
+
+          <!-- Style Switcher -->
+          <li class="nav-item dropdown me-sm-2 me-xl-0">
+            <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill waves-effect" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown" aria-label="Toggle theme (light)" aria-expanded="false">
+              <i class="ri-sun-line icon-base ri icon-22px theme-icon-active"></i>
+              <span class="d-none ms-2" id="nav-theme-text">Toggle theme</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-theme-text">
+              <li>
+                <button type="button" class="dropdown-item align-items-center waves-effect active" data-bs-theme-value="light" aria-pressed="true">
+                  <span> <i class="icon-base ri ri-sun-line icon-md me-3" data-icon="sun-line"></i>Светлая</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item align-items-center waves-effect" data-bs-theme-value="dark" aria-pressed="false">
+                  <span> <i class="icon-base ri ri-moon-clear-line icon-md me-3" data-icon="moon-clear-line"></i>Темная</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item align-items-center waves-effect" data-bs-theme-value="system" aria-pressed="false">
+                  <span> <i class="icon-base ri ri-computer-line icon-md me-3" data-icon="computer-line"></i>Системная</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+          <!-- / Style Switcher-->
+
+                <!-- User -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                  <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <div class="avatar avatar-online">
+                      {% if user.is_authenticated and user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="Аватар" class="rounded-circle">
+                      {% else %}
+                        <span class="avatar-initial rounded-circle bg-label-primary">
+                          {% if user.is_authenticated %}
+                            {{ user.first_name|first|default:user.username|first|upper }}
+                          {% else %}
+                            U
+                          {% endif %}
+                        </span>
+                      {% endif %}
+                    </div>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end mt-3 py-2">
+                    <li>
+                      <a class="dropdown-item waves-effect" href="javascript:void(0);">
+                        <div class="d-flex align-items-center">
+                          <div class="flex-shrink-0 me-2">
+                            <div class="avatar avatar-online">
+                              {% if user.is_authenticated and user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="Аватар" class="rounded-circle">
+                              {% else %}
+                                <span class="avatar-initial rounded-circle bg-label-primary">
+                                  {% if user.is_authenticated %}
+                                    {{ user.first_name|first|default:user.username|first|upper }}
+                                  {% else %}
+                                    U
+                                  {% endif %}
+                                </span>
+                              {% endif %}
+                            </div>
+                          </div>
+                          <div class="flex-grow-1">
+                            <h6 class="mb-0 small">
+                              {% if user.is_authenticated %}
+                                {{ user.first_name|default:user.username }}
+                              {% else %}
+                                Пользователь
+                              {% endif %}
+                            </h6>
+                            <small class="text-body-secondary">
+                              {% if user.is_authenticated %}
+                                {{ user.groups.first.name|default:"Пользователь" }}
+                              {% else %}
+                                Гость
+                              {% endif %}
+                            </small>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                      <a class="dropdown-item waves-effect" href="{% url 'user_profile:profile_settings' %}">
+                        <i class="icon-base ri ri-user-3-line icon-22px me-2"></i>
+                        <span class="align-middle">Мой профиль</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item waves-effect" href="javascript:void(0);">
+                        <i class="icon-base ri ri-settings-4-line icon-22px me-2"></i>
+                        <span class="align-middle">Настройки</span>
+                      </a>
+                    </li>
+                    <li>
+                      <div class="dropdown-divider"></div>
+                    </li>
+                    <li>
+                      <div class="d-grid px-4 pt-2 pb-1">
+                        {% if user.is_authenticated %}
+                          <a class="btn btn-danger d-flex waves-effect waves-light" href="{% url 'logout' %}">
+                            <small class="align-middle">Выйти</small>
+                            <i class="icon-base ri ri-logout-box-r-line ms-2 icon-16px"></i>
+                          </a>
+                        {% else %}
+                          <a class="btn btn-primary d-flex waves-effect waves-light" href="{% url 'login' %}">
+                            <small class="align-middle">Войти</small>
+                            <i class="icon-base ri ri-login-box-line ms-2 icon-16px"></i>
+                          </a>
+                        {% endif %}
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+                <!--/ User -->
+              </ul>
+            </div>
+          </nav>
+          <!-- / Navbar -->
+
+          <!-- Content wrapper -->
+          <div class="content-wrapper">
+            <!-- Content -->
+            <div class="container-xxl flex-grow-1 container-p-y">
+              {% block content %}{% endblock %}
+            </div>
+            <!-- / Content -->
+
+            <!-- Footer -->
+            <footer class="content-footer footer bg-footer-theme">
+              <div class="container-xxl">
+                {% block footer %}
+                <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
+                  <div>© {% now 'Y' %} CRM System</div>
+                </div>
+                {% endblock %}
+              </div>
+            </footer>
+            <!-- / Footer -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
+        </div>
+        <!-- / Layout page -->
+      </div>
+
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle" style="display: none;"></div>
+    </div>
+    <!-- / Layout wrapper -->
+
+    <!-- Core JS -->
+    <script src="{% static 'frontend/assets/vendor/libs/jquery/jquery.js' %}"></script>
+    <script src="{% static 'frontend/assets/vendor/libs/popper/popper.js' %}"></script>
+    <script src="{% static 'frontend/assets/vendor/js/bootstrap.js' %}"></script>
+    <script src="{% static 'frontend/assets/vendor/libs/node-waves/node-waves.js' %}"></script>
+    <script src="{% static 'frontend/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+    <script src="{% static 'frontend/assets/vendor/js/menu.js' %}"></script>
+
+    <!-- Vendors JS -->
+    <script src="{% static 'frontend/assets/vendor/libs/apex-charts/apexcharts.js' %}"></script>
+
+    <!-- Main JS -->
+    <script src="{% static 'frontend/assets/js/main.js' %}"></script>
+    <script src="{% static 'frontend/assets/js/settings.js' %}"></script>
+
+    <script>
+      // Обработка сворачивания боковой панели
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuToggles = document.querySelectorAll('.layout-menu-toggle');
+        const overlay = document.querySelector('.layout-overlay');
+        const root = document.documentElement;
+        
+        // Восстанавливаем состояние из localStorage
+        const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+        if (isCollapsed) {
+          root.classList.add('layout-menu-collapsed');
+        }
+        
+        menuToggles.forEach(function(toggle) {
+          toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            root.classList.toggle('layout-menu-collapsed');
+            
+            // Сохраняем состояние в localStorage
+            const isNowCollapsed = root.classList.contains('layout-menu-collapsed');
+            localStorage.setItem('sidebar-collapsed', isNowCollapsed.toString());
+            
+            // Показываем/скрываем overlay на мобильных устройствах
+            if (window.innerWidth < 1200) {
+              if (isNowCollapsed) {
+                overlay.style.display = 'block';
+                setTimeout(() => overlay.classList.add('show'), 10);
+              } else {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.style.display = 'none', 300);
+              }
+            }
+          });
+        });
+        
+        // Закрытие меню при клике на overlay
+        if (overlay) {
+          overlay.addEventListener('click', function() {
+            root.classList.remove('layout-menu-collapsed');
+            localStorage.setItem('sidebar-collapsed', 'false');
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.style.display = 'none', 300);
+          });
+        }
+        
+        // Обработка изменения размера окна
+        window.addEventListener('resize', function() {
+          if (window.innerWidth >= 1200) {
+            // На больших экранах убираем overlay
+            if (overlay) {
+              overlay.classList.remove('show');
+              overlay.style.display = 'none';
+            }
+          } else {
+            // На мобильных устройствах показываем overlay если меню открыто
+            if (root.classList.contains('layout-menu-collapsed') && overlay) {
+              overlay.style.display = 'block';
+              setTimeout(() => overlay.classList.add('show'), 10);
+            }
+          }
+        });
+      });
+      
+      // Обработка раскрывающегося меню
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuToggles = document.querySelectorAll('.menu-toggle');
+        menuToggles.forEach(function(toggle) {
+          toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const menuItem = this.closest('.menu-item');
+            const menuSub = menuItem.querySelector('.menu-sub');
+            
+            if (menuSub) {
+              // Закрываем все другие открытые подменю
+              document.querySelectorAll('.menu-item.open').forEach(function(item) {
+                if (item !== menuItem) {
+                  item.classList.remove('open');
+                }
+              });
+              
+              // Переключаем текущее подменю
+              menuItem.classList.toggle('open');
+            }
+          });
+        });
+
+        // Функционал переключения тем
+        function getStoredTheme() {
+          return localStorage.getItem('theme') || 'light';
+        }
+
+        function setStoredTheme(theme) {
+          localStorage.setItem('theme', theme);
+        }
+
+        function getPreferredTheme() {
+          const stored = getStoredTheme();
+          if (stored !== 'system') {
+            return stored;
+          }
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function setTheme(theme) {
+          if (theme === 'system') {
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-bs-theme', systemTheme);
+          } else {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+          }
+        }
+
+        function showActiveTheme(theme, focus = false) {
+          const themeToggle = document.querySelector('#nav-theme');
+          const themeToggleText = document.querySelector('#nav-theme-text');
+          const themeIcon = document.querySelector('.theme-icon-active');
+          const themeButton = document.querySelector(`[data-bs-theme-value="${theme}"]`);
+          
+          if (themeButton) {
+            const icon = themeButton.querySelector('i').getAttribute('data-icon');
+            
+            // Убираем активный класс со всех кнопок
+            document.querySelectorAll('[data-bs-theme-value]').forEach(function(btn) {
+              btn.classList.remove('active');
+              btn.setAttribute('aria-pressed', 'false');
+            });
+            
+            // Активируем выбранную кнопку
+            themeButton.classList.add('active');
+            themeButton.setAttribute('aria-pressed', 'true');
+            
+            // Обновляем иконку
+            if (themeIcon) {
+              const classes = Array.from(themeIcon.classList).filter(function(cls) {
+                return !cls.startsWith('ri-');
+              });
+              themeIcon.setAttribute('class', `ri-${icon} ${classes.join(' ')}`);
+            }
+            
+            // Обновляем aria-label
+            if (themeToggle && themeToggleText) {
+              const label = `${themeToggleText.textContent} (${theme})`;
+              themeToggle.setAttribute('aria-label', label);
+              if (focus) {
+                themeToggle.focus();
+              }
+            }
+          }
+        }
+
+        // Инициализация темы
+        const currentTheme = getPreferredTheme();
+        setTheme(currentTheme);
+        showActiveTheme(getStoredTheme());
+
+        // Обработчики переключения тем
+        document.querySelectorAll('[data-bs-theme-value]').forEach(function(button) {
+          button.addEventListener('click', function() {
+            const theme = this.getAttribute('data-bs-theme-value');
+            setStoredTheme(theme);
+            setTheme(theme);
+            showActiveTheme(theme, true);
+          });
+        });
+
+    // Слушаем изменения системной темы
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      const stored = getStoredTheme();
+      if (stored === 'system') {
+        setTheme('system');
+      }
+    });
+
+    // Система уведомлений в dropdown
+    function addNotificationToDropdown(message, type = 'success') {
+      const notificationsList = document.querySelector('.dropdown-notifications-list ul');
+      if (!notificationsList) return;
+
+      // Определяем иконку и цвет в зависимости от типа
+      let icon, bgClass, avatarText;
+      switch(type) {
+        case 'success':
+          icon = 'ri-check-line';
+          bgClass = 'bg-label-success';
+          avatarText = '✓';
+          break;
+        case 'error':
+          icon = 'ri-error-warning-line';
+          bgClass = 'bg-label-danger';
+          avatarText = '!';
+          break;
+        case 'warning':
+          icon = 'ri-alert-line';
+          bgClass = 'bg-label-warning';
+          avatarText = '⚠';
+          break;
+        case 'info':
+          icon = 'ri-information-line';
+          bgClass = 'bg-label-info';
+          avatarText = 'i';
+          break;
+        default:
+          icon = 'ri-notification-line';
+          bgClass = 'bg-label-primary';
+          avatarText = 'N';
+      }
+
+      // Создаем HTML для нового уведомления
+      const notificationHTML = `
+        <li class="list-group-item list-group-item-action dropdown-notifications-item waves-effect">
+          <div class="d-flex">
+            <div class="flex-shrink-0 me-3">
+              <div class="avatar">
+                <span class="avatar-initial rounded-circle ${bgClass}">${avatarText}</span>
+              </div>
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="small mb-50">Системное уведомление</h6>
+              <small class="mb-1 d-block text-body">${message}</small>
+              <small class="text-body-secondary">только что</small>
+            </div>
+            <div class="flex-shrink-0 dropdown-notifications-actions">
+              <a href="javascript:void(0)" class="dropdown-notifications-read"> <span class="badge badge-dot"></span></a>
+              <a href="javascript:void(0)" class="dropdown-notifications-archive"> <span class="icon-base ri ri-close-line"></span></a>
+            </div>
+          </div>
+        </li>
+      `;
+
+      // Добавляем уведомление в начало списка
+      notificationsList.insertAdjacentHTML('afterbegin', notificationHTML);
+
+      // Обновляем счетчик новых уведомлений
+      updateNotificationCount();
+
+      // Добавляем обработчики для новых кнопок
+      const newNotification = notificationsList.firstElementChild;
+      addNotificationHandlers(newNotification);
+    }
+
+    // Функция обновления счетчика уведомлений
+    function updateNotificationCount() {
+      const unreadNotifications = document.querySelectorAll('.dropdown-notifications-item:not(.marked-as-read)');
+      const count = unreadNotifications.length;
+      
+      const badge = document.querySelector('.badge-notifications');
+      if (badge) {
+        badge.style.display = count > 0 ? 'block' : 'none';
+      }
+      
+      const newBadge = document.querySelector('.badge.bg-label-primary');
+      if (newBadge) {
+        newBadge.textContent = count > 0 ? `${count} Новых` : '0 Новых';
+      }
+    }
+
+    // Добавление обработчиков для новых уведомлений
+    function addNotificationHandlers(notificationElement) {
+      // Отметить как прочитанное
+      const readBtn = notificationElement.querySelector('.dropdown-notifications-read');
+      if (readBtn) {
+        readBtn.addEventListener('click', function() {
+          if (!notificationElement.classList.contains('marked-as-read')) {
+            notificationElement.classList.add('marked-as-read');
+            updateNotificationCount();
+          }
+        });
+      }
+
+      // Удалить уведомление
+      const archiveBtn = notificationElement.querySelector('.dropdown-notifications-archive');
+      if (archiveBtn) {
+        archiveBtn.addEventListener('click', function() {
+          notificationElement.remove();
+          updateNotificationCount();
+        });
+      }
+    }
+
+    // Глобальная функция для показа уведомлений
+    window.showNotification = addNotificationToDropdown;
+
+    // Обработка уведомлений
+    document.addEventListener('DOMContentLoaded', function() {
+      // Отключаем автоматическое закрытие dropdown при клике вне их области
+      document.addEventListener('click', function(e) {
+        // Если клик не по dropdown элементу, не закрываем dropdown
+        if (!e.target.closest('.dropdown')) {
+          return;
+        }
+      });
+
+      // Предотвращаем закрытие dropdown при открытии других dropdown
+      const allDropdownToggles = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+      allDropdownToggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+      });
+
+      // Отключаем автоматическое закрытие dropdown при клике вне области
+      document.addEventListener('click', function(e) {
+        // Если клик по элементу навбара, не закрываем dropdown
+        if (e.target.closest('.navbar')) {
+          return;
+        }
+      });
+
+      // Отметить все как прочитанные
+      const markAllReadBtn = document.querySelector('.dropdown-notifications-all');
+      if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function() {
+          const notifications = document.querySelectorAll('.dropdown-notifications-item');
+          notifications.forEach(function(notification) {
+            notification.classList.add('marked-as-read');
+          });
+          
+          // Обновляем счетчик
+          const badge = document.querySelector('.badge-notifications');
+          if (badge) {
+            badge.style.display = 'none';
+          }
+          
+          const newBadge = document.querySelector('.badge.bg-label-primary');
+          if (newBadge) {
+            newBadge.textContent = '0 Новых';
+          }
+        });
+      }
+
+      // Добавляем обработчики для существующих уведомлений
+      const existingNotifications = document.querySelectorAll('.dropdown-notifications-item');
+      existingNotifications.forEach(function(notification) {
+        addNotificationHandlers(notification);
+      });
+    });
+      });
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
+
+

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Роли и права{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-datatable">
+      <div id="DataTables_Table_0_wrapper" class="dt-container dt-bootstrap5 dt-empty-footer">
+        <div class="row mx-2">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+            <div class="dt-length mb-0 mb-md-5">
+              <label for="dt-length-0">Show</label>
+              <select class="form-select form-select-sm" id="dt-length-0" onchange="window.location.href='?page=1&length='+this.value;">
+                <option value="10" {% if groups.per_page == 10 %}selected{% endif %}>10</option>
+                <option value="25" {% if groups.per_page == 25 %}selected{% endif %}>25</option>
+                <option value="50" {% if groups.per_page == 50 %}selected{% endif %}>50</option>
+                <option value="100" {% if groups.per_page == 100 %}selected{% endif %}>100</option>
+              </select>
+            </div>
+          </div>
+          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+            <div class="dt-search me-4">
+              <input type="search" class="form-control form-control-sm" id="dt-search-0" placeholder="Поиск группы">
+              <label for="dt-search-0"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="justify-content-between dt-layout-table">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-full table-responsive">
+            <table class="datatables-permissions table dataTable dtr-column" id="DataTables_Table_0" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Название</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for g in groups.object_list %}
+                <tr>
+                  <td>{{ g.name }}</td>
+                </tr>
+                {% empty %}
+                <tr><td class="text-center text-muted py-5">Группы не найдены</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mx-3 justify-content-between">
+          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
+            <div class="dt-info" aria-live="polite" id="DataTables_Table_0_info" role="status">
+              Показано {{ groups.start_index }} - {{ groups.end_index }} из {{ groups.paginator.count }} записей
+            </div>
+          </div>
+          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
+            <div class="dt-paging">
+              {% if groups.has_other_pages %}
+              <nav aria-label="pagination">
+                <ul class="pagination">
+                  <li class="dt-paging-button page-item {% if not groups.has_previous %}disabled{% endif %}">
+                    <a class="page-link first" href="?page=1" aria-label="First"><i class="icon-base ri ri-skip-back-mini-line icon-22px"></i></a>
+                  </li>
+                  <li class="dt-paging-button page-item {% if not groups.has_previous %}disabled{% endif %}">
+                    {% if groups.has_previous %}
+                      <a class="page-link previous" href="?page={{ groups.previous_page_number }}" aria-label="Previous"><i class="icon-base ri ri-arrow-left-s-line icon-22px"></i></a>
+                    {% else %}
+                      <span class="page-link previous" aria-disabled="true"><i class="icon-base ri ri-arrow-left-s-line icon-22px"></i></span>
+                    {% endif %}
+                  </li>
+                  <li class="dt-paging-button page-item active"><span class="page-link">{{ groups.number }}</span></li>
+                  <li class="dt-paging-button page-item {% if not groups.has_next %}disabled{% endif %}">
+                    {% if groups.has_next %}
+                      <a class="page-link next" href="?page={{ groups.next_page_number }}" aria-label="Next"><i class="icon-base ri ri-arrow-right-s-line icon-22px"></i></a>
+                    {% else %}
+                      <span class="page-link next" aria-disabled="true"><i class="icon-base ri ri-arrow-right-s-line icon-22px"></i></span>
+                    {% endif %}
+                  </li>
+                  <li class="dt-paging-button page-item {% if not groups.has_next %}disabled{% endif %}">
+                    <a class="page-link last" href="?page={{ groups.paginator.num_pages }}" aria-label="Last"><i class="icon-base ri ri-skip-forward-mini-line icon-22px"></i></a>
+                  </li>
+                </ul>
+              </nav>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const searchInput = document.getElementById('dt-search-0');
+    const table = document.getElementById('DataTables_Table_0');
+    if(!searchInput||!table) return; const tbody = table.querySelector('tbody');
+    function n(t){return (t||'').toString().toLowerCase().trim()}
+    function f(q){ const rows=[...tbody.querySelectorAll('tr')]; const s=n(q);
+      rows.forEach(tr=>{ const tds=tr.querySelectorAll('td'); if(!tds.length) return; const name=n(tds[0].innerText); tr.style.display = s===''||name.includes(s)?'':'none'; }); }
+    searchInput.addEventListener('input', e=>f(e.target.value));
+  })();
+  </script>
+{% endblock %}
+

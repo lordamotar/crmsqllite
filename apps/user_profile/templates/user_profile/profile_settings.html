@@ -1,0 +1,1221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Настройки профиля{% endblock %}
+
+{% block content %}
+<div class="row fv-plugins-icon-container">
+  <div class="col-md-12">
+    <div class="nav-align-top">
+      <ul class="nav nav-pills flex-column flex-md-row mb-6 gap-2 gap-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active waves-effect waves-light" href="javascript:void(0);">
+            <i class="icon-base ri ri-group-line icon-sm me-1_5"></i>Профиль
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link waves-effect waves-light" href="javascript:void(0);">
+            <i class="icon-base ri ri-lock-line icon-sm me-1_5"></i>Безопасность
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link waves-effect waves-light" href="javascript:void(0);">
+            <i class="icon-base ri ri-bookmark-line icon-sm me-1_5"></i>Billing & Plans
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link waves-effect waves-light" href="javascript:void(0);">
+            <i class="icon-base ri ri-notification-4-line icon-sm me-1_5"></i>Уведомления
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link waves-effect waves-light" href="javascript:void(0);">
+            <i class="icon-base ri ri-settings-3-line icon-sm me-1_5"></i>Настройки
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="card mb-6">
+      <!-- Профиль -->
+      <div class="card-body">
+        <div class="d-flex align-items-start align-items-sm-center gap-6">
+          <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'frontend/assets/img/avatars/1.png' %}{% endif %}" 
+               alt="user-avatar" class="d-block w-px-100 h-px-100 rounded" id="uploadedAvatar">
+          <div class="button-wrapper">
+            <label for="upload" class="btn btn-sm btn-primary me-3 mb-4 waves-effect waves-light" tabindex="0">
+              <span class="d-none d-sm-block">Загрузить фото</span>
+              <i class="icon-base ri ri-upload-2-line d-block d-sm-none"></i>
+              <input type="file" id="upload" class="account-file-input" hidden accept="image/png, image/jpeg">
+            </label>
+            <button type="button" class="btn btn-sm btn-outline-danger account-image-reset mb-4 waves-effect">
+              <i class="icon-base ri ri-refresh-line d-block d-sm-none"></i>
+              <span class="d-none d-sm-block">Сбросить</span>
+            </button>
+            <div>Разрешены JPG, GIF или PNG. Максимальный размер 800K</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card-body pt-0">
+        <form id="formAccountSettings" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row mt-1 g-5">
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="text" id="first_name" name="first_name" 
+                       value="{{ form.first_name.value|default:user.first_name }}" autofocus>
+                <label for="first_name">Имя</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="text" name="last_name" id="last_name" 
+                       value="{{ form.last_name.value|default:user.last_name }}">
+                <label for="last_name">Фамилия</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="text" name="middle_name" id="middle_name" 
+                       value="{{ form.middle_name.value|default:user.middle_name }}">
+                <label for="middle_name">Отчество</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="email" id="email" name="email" 
+                       value="{{ form.email.value|default:user.email }}" placeholder="email@example.com">
+                <label for="email">Email</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group input-group-merge">
+                <div class="form-floating form-floating-outline">
+                  <input type="text" id="phone" name="phone" class="form-control" 
+                         value="{{ form.phone.value|default:user.phone }}" placeholder="+7 777 123 45 67">
+                  <label for="phone">Номер телефона</label>
+                </div>
+                <span class="input-group-text">KZ (+7)</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="form-floating form-floating-outline">
+                <textarea class="form-control" id="bio" name="bio" rows="3" 
+                          placeholder="Расскажите о себе">{{ form.bio.value|default:user.bio }}</textarea>
+                <label for="bio">О себе</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <select id="language" name="language" class="form-select">
+                  <option value="ru" {% if form.language.value == 'ru' or profile.language == 'ru' %}selected{% endif %}>Русский</option>
+                  <option value="en" {% if form.language.value == 'en' or profile.language == 'en' %}selected{% endif %}>English</option>
+                  <option value="kk" {% if form.language.value == 'kk' or profile.language == 'kk' %}selected{% endif %}>Қазақша</option>
+                </select>
+                <label for="language">Язык</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <select id="timezone" name="timezone" class="form-select">
+                  <option value="Asia/Almaty" {% if form.timezone.value == 'Asia/Almaty' or profile.timezone == 'Asia/Almaty' %}selected{% endif %}>Алматы (UTC+6)</option>
+                  <option value="Asia/Aqtobe" {% if form.timezone.value == 'Asia/Aqtobe' or profile.timezone == 'Asia/Aqtobe' %}selected{% endif %}>Актобе (UTC+5)</option>
+                  <option value="Asia/Aqtau" {% if form.timezone.value == 'Asia/Aqtau' or profile.timezone == 'Asia/Aqtau' %}selected{% endif %}>Актау (UTC+5)</option>
+                  <option value="Asia/Oral" {% if form.timezone.value == 'Asia/Oral' or profile.timezone == 'Asia/Oral' %}selected{% endif %}>Уральск (UTC+5)</option>
+                  <option value="Asia/Qyzylorda" {% if form.timezone.value == 'Asia/Qyzylorda' or profile.timezone == 'Asia/Qyzylorda' %}selected{% endif %}>Кызылорда (UTC+6)</option>
+                  <option value="Asia/Atyrau" {% if form.timezone.value == 'Asia/Atyrau' or profile.timezone == 'Asia/Atyrau' %}selected{% endif %}>Атырау (UTC+5)</option>
+                </select>
+                <label for="timezone">Часовой пояс</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <select id="currency" name="currency" class="form-select">
+                  <option value="KZT" {% if form.currency.value == 'KZT' or profile.currency == 'KZT' %}selected{% endif %}>Тенге (KZT)</option>
+                  <option value="USD" {% if form.currency.value == 'USD' or profile.currency == 'USD' %}selected{% endif %}>Доллар (USD)</option>
+                  <option value="EUR" {% if form.currency.value == 'EUR' or profile.currency == 'EUR' %}selected{% endif %}>Евро (EUR)</option>
+                  <option value="RUB" {% if form.currency.value == 'RUB' or profile.currency == 'RUB' %}selected{% endif %}>Рубль (RUB)</option>
+                </select>
+                <label for="currency">Валюта</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <select id="theme" name="theme" class="form-select">
+                  <option value="light" {% if form.theme.value == 'light' or profile.theme == 'light' %}selected{% endif %}>Светлая</option>
+                  <option value="dark" {% if form.theme.value == 'dark' or profile.theme == 'dark' %}selected{% endif %}>Темная</option>
+                  <option value="system" {% if form.theme.value == 'system' or profile.theme == 'system' %}selected{% endif %}>Системная</option>
+                </select>
+                <label for="theme">Тема</label>
+              </div>
+            </div>
+          </div>
+          
+           <!-- Должность и отдел -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <h6 class="mb-3">Должность и отдел</h6>
+              <div class="row g-5">
+                <div class="col-md-6">
+                  <div class="form-floating form-floating-outline">
+                    <input class="form-control bg-light" type="text" value="{{ user.position.name|default:'Не указана' }}" readonly style="cursor: not-allowed;">
+                    <label>Должность</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating form-floating-outline">
+                    <input class="form-control bg-light" type="text" value="{{ user.branch.name|default:'Не указан' }}" readonly style="cursor: not-allowed;">
+                    <label>Филиал</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating form-floating-outline">
+                    <input class="form-control bg-light" type="text" value="{{ user.role.name|default:'Не указана' }}" readonly style="cursor: not-allowed;">
+                    <label>Роль</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating form-floating-outline">
+                    <input class="form-control bg-light" type="text" value="{{ user.manager.short_name|default:'Не указан' }}" readonly style="cursor: not-allowed;">
+                    <label>Начальник</label>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <small class="text-body-secondary">
+                  <i class="icon-base ri ri-information-line me-1"></i>
+                  Данные о должности, филиале, роли и начальнике управляются администратором системы
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6">
+            <button type="submit" class="btn btn-primary me-3 waves-effect waves-light">Сохранить изменения</button>
+            <button type="reset" class="btn btn-outline-secondary waves-effect">Сбросить</button>
+          </div>
+        </form>
+      </div>
+      <!-- /Профиль -->
+    </div>
+    
+    <!-- Безопасность -->
+    <div class="card mb-6" id="security" style="display: none;">
+      <h5 class="card-header">Безопасность</h5>
+      <div class="card-body">
+        <h6 class="mb-3">Изменение пароля</h6>
+        <form id="formChangePassword" method="POST">
+          {% csrf_token %}
+          <div class="row g-5">
+            <div class="col-md-12">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="password" id="old_password" name="old_password" required>
+                <label for="old_password">Текущий пароль</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="password" id="new_password1" name="new_password1" required>
+                <label for="new_password1">Новый пароль</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating form-floating-outline">
+                <input class="form-control" type="password" id="new_password2" name="new_password2" required>
+                <label for="new_password2">Повторить новый пароль</label>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6">
+            <button type="submit" class="btn btn-primary me-3 waves-effect waves-light">Изменить пароль</button>
+            <button type="reset" class="btn btn-outline-secondary waves-effect">Сбросить</button>
+          </div>
+        </form>
+        
+        <div class="mt-6">
+          <h6 class="mb-3">Активные сессии</h6>
+          <div class="card border">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">Текущая сессия</h6>
+                  <small class="text-body-secondary">Windows • Chrome • Алматы, Казахстан</small>
+                </div>
+                <span class="badge bg-label-success">Активна</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Billing & Plans -->
+    <div class="card mb-6" id="billing-plans" style="display: none;">
+      <h5 class="card-header">Billing & Plans</h5>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card border">
+              <div class="card-body text-center">
+                <h5 class="card-title">Current Plan</h5>
+                <div class="mb-3">
+                  <span class="badge bg-label-primary fs-6">Free Plan</span>
+                </div>
+                <p class="text-body-secondary">You are currently using the free plan</p>
+                <ul class="list-unstyled">
+                  <li><i class="icon-base ri ri-check-line text-success me-2"></i>Up to 5 clients</li>
+                  <li><i class="icon-base ri ri-check-line text-success me-2"></i>Basic support</li>
+                  <li><i class="icon-base ri ri-check-line text-success me-2"></i>Standard features</li>
+                </ul>
+                <button class="btn btn-primary waves-effect waves-light">Upgrade Plan</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border">
+              <div class="card-body text-center">
+                <h5 class="card-title">Usage</h5>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Clients</span>
+                    <span class="fw-semibold">3 / 5</span>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Orders</span>
+                    <span class="fw-semibold">12 / Unlimited</span>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Storage</span>
+                    <span class="fw-semibold">2.1 GB / 5 GB</span>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 42%" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="mb-3">Available Plans</h6>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card border">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Basic</h6>
+                    <div class="mb-3">
+                      <span class="h4">$9</span>
+                      <span class="text-body-secondary">/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Up to 50 clients</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Priority support</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Advanced features</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>10 GB storage</li>
+                    </ul>
+                    <button class="btn btn-outline-primary waves-effect waves-light">Choose Plan</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card border border-primary">
+                  <div class="card-body text-center">
+                    <div class="badge bg-label-primary mb-2">Popular</div>
+                    <h6 class="card-title">Pro</h6>
+                    <div class="mb-3">
+                      <span class="h4">$29</span>
+                      <span class="text-body-secondary">/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Unlimited clients</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>24/7 support</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>All features</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>100 GB storage</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>API access</li>
+                    </ul>
+                    <button class="btn btn-primary waves-effect waves-light">Choose Plan</button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card border">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Enterprise</h6>
+                    <div class="mb-3">
+                      <span class="h4">$99</span>
+                      <span class="text-body-secondary">/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Unlimited everything</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Dedicated support</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Custom integrations</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>Unlimited storage</li>
+                      <li><i class="icon-base ri ri-check-line text-success me-2"></i>White-label</li>
+                    </ul>
+                    <button class="btn btn-outline-primary waves-effect waves-light">Contact Sales</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="mb-3">Payment Method</h6>
+            <div class="card border">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <i class="icon-base ri ri-bank-card-line icon-24px me-3"></i>
+                    <div>
+                      <h6 class="mb-0">**** **** **** 1234</h6>
+                      <small class="text-body-secondary">Expires 12/25</small>
+                    </div>
+                  </div>
+                  <button class="btn btn-outline-secondary waves-effect waves-light">Update</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="mb-3">Billing History</h6>
+            <div class="table-responsive">
+              <table class="table table-borderless">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Jan 15, 2025</td>
+                    <td>Pro Plan - Monthly</td>
+                    <td>$29.00</td>
+                    <td><span class="badge bg-label-success">Paid</span></td>
+                    <td><a href="#" class="btn btn-sm btn-outline-primary">Download</a></td>
+                  </tr>
+                  <tr>
+                    <td>Dec 15, 2024</td>
+                    <td>Pro Plan - Monthly</td>
+                    <td>$29.00</td>
+                    <td><span class="badge bg-label-success">Paid</span></td>
+                    <td><a href="#" class="btn btn-sm btn-outline-primary">Download</a></td>
+                  </tr>
+                  <tr>
+                    <td>Nov 15, 2024</td>
+                    <td>Basic Plan - Monthly</td>
+                    <td>$9.00</td>
+                    <td><span class="badge bg-label-success">Paid</span></td>
+                    <td><a href="#" class="btn btn-sm btn-outline-primary">Download</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Настройки -->
+    <div class="card mb-6" id="settings" style="display: none;">
+      <h5 class="card-header">Настройки системы</h5>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="mb-3">Общие настройки</h6>
+            <div class="card border">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Автосохранение</h6>
+                    <small class="text-body-secondary">Автоматически сохранять изменения в формах</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="autoSave" checked>
+                    <label class="form-check-label" for="autoSave"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Уведомления браузера</h6>
+                    <small class="text-body-secondary">Показывать уведомления в браузере</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="browserNotifications">
+                    <label class="form-check-label" for="browserNotifications"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Звуковые уведомления</h6>
+                    <small class="text-body-secondary">Воспроизводить звук при получении уведомлений</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="soundNotifications" checked>
+                    <label class="form-check-label" for="soundNotifications"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-1">Темная тема</h6>
+                    <small class="text-body-secondary">Использовать темную тему интерфейса</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="darkTheme">
+                    <label class="form-check-label" for="darkTheme"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <h6 class="mb-3">Настройки таблиц</h6>
+            <div class="card border">
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="defaultPageSize" class="form-label">Количество записей на странице по умолчанию</label>
+                  <select class="form-select" id="defaultPageSize">
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Компактный режим</h6>
+                    <small class="text-body-secondary">Уменьшить отступы в таблицах</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="compactMode">
+                    <label class="form-check-label" for="compactMode"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Сохранение состояния таблиц</h6>
+                    <small class="text-body-secondary">Запоминать сортировку и фильтры</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="saveTableState" checked>
+                    <label class="form-check-label" for="saveTableState"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Автообновление</h6>
+                    <small class="text-body-secondary">Автоматически обновлять данные в таблицах</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="autoRefresh">
+                    <label class="form-check-label" for="autoRefresh"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-1">Цветные строки заказов</h6>
+                    <small class="text-body-secondary">Раскрашивать строки заказов по статусу</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="coloredOrderRows" checked>
+                    <label class="form-check-label" for="coloredOrderRows"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <h6 class="mb-3">Настройки безопасности</h6>
+            <div class="card border">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Двухфакторная аутентификация</h6>
+                    <small class="text-body-secondary">Дополнительная защита аккаунта</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="twoFactor">
+                    <label class="form-check-label" for="twoFactor"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-1">Уведомления о входе</h6>
+                    <small class="text-body-secondary">Получать уведомления о новых входах</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="loginNotifications" checked>
+                    <label class="form-check-label" for="loginNotifications"></label>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-1">Автоматический выход</h6>
+                    <small class="text-body-secondary">Выходить из системы при неактивности</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="autoLogout" checked>
+                    <label class="form-check-label" for="autoLogout"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <h6 class="mb-3">Настройки данных</h6>
+            <div class="card border">
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="dateFormat" class="form-label">Формат даты</label>
+                  <select class="form-select" id="dateFormat">
+                    <option value="DD.MM.YYYY" selected>DD.MM.YYYY</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                  </select>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="timeFormat" class="form-label">Формат времени</label>
+                  <select class="form-select" id="timeFormat">
+                    <option value="24" selected>24 часа</option>
+                    <option value="12">12 часов (AM/PM)</option>
+                  </select>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="numberFormat" class="form-label">Формат чисел</label>
+                  <select class="form-select" id="numberFormat">
+                    <option value="space" selected>Пробелы (1 234 567)</option>
+                    <option value="comma">Запятые (1,234,567)</option>
+                    <option value="dot">Точки (1.234.567)</option>
+                  </select>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-1">Экспорт данных</h6>
+                    <small class="text-body-secondary">Разрешить экспорт в Excel/CSV</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="allowExport" checked>
+                    <label class="form-check-label" for="allowExport"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-12">
+            <h6 class="mb-3">Дополнительные действия</h6>
+            <div class="card border">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <button class="btn btn-outline-primary w-100 waves-effect waves-light" onclick="exportUserData()">
+                      <i class="icon-base ri ri-download-line me-2"></i>
+                      Экспорт данных
+                    </button>
+                  </div>
+                  <div class="col-md-4">
+                    <button class="btn btn-outline-warning w-100 waves-effect waves-light" onclick="clearCache()">
+                      <i class="icon-base ri ri-refresh-line me-2"></i>
+                      Очистить кэш
+                    </button>
+                  </div>
+                  <div class="col-md-4">
+                    <button class="btn btn-outline-danger w-100 waves-effect waves-light" onclick="resetSettings()">
+                      <i class="icon-base ri ri-restart-line me-2"></i>
+                      Сбросить настройки
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="button" class="btn btn-primary me-3 waves-effect waves-light" onclick="saveSettings()">
+            <i class="icon-base ri ri-save-line me-2"></i>
+            Сохранить настройки
+          </button>
+          <button type="button" class="btn btn-outline-secondary waves-effect" onclick="resetSettings()">
+            <i class="icon-base ri ri-refresh-line me-2"></i>
+            Сбросить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Переключение вкладок
+  const navLinks = document.querySelectorAll('.nav-link');
+  const profileCard = document.querySelector('.card.mb-6');
+  const securityCard = document.getElementById('security');
+  const billingCard = document.getElementById('billing-plans');
+  const settingsCard = document.getElementById('settings');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Убираем активный класс со всех вкладок
+      navLinks.forEach(nav => nav.classList.remove('active'));
+      // Добавляем активный класс к текущей вкладке
+      this.classList.add('active');
+      
+      // Скрываем все карточки
+      profileCard.style.display = 'none';
+      if (securityCard) securityCard.style.display = 'none';
+      if (billingCard) billingCard.style.display = 'none';
+      if (settingsCard) settingsCard.style.display = 'none';
+      
+      // Показываем нужную карточку
+      if (this.textContent.includes('Профиль')) {
+        profileCard.style.display = 'block';
+      } else if (this.textContent.includes('Безопасность')) {
+        if (securityCard) securityCard.style.display = 'block';
+      } else if (this.textContent.includes('Billing')) {
+        if (billingCard) billingCard.style.display = 'block';
+      } else if (this.textContent.includes('Настройки')) {
+        if (settingsCard) settingsCard.style.display = 'block';
+      }
+    });
+  });
+  
+  // Загрузка аватара
+  const uploadInput = document.getElementById('upload');
+  const uploadedAvatar = document.getElementById('uploadedAvatar');
+  
+  uploadInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      fetch('{% url "user_profile:upload_avatar" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          uploadedAvatar.src = data.avatar_url;
+          
+          // Обновляем аватары в навбаре
+          const navbarAvatars = document.querySelectorAll('.navbar .avatar img');
+          navbarAvatars.forEach(img => {
+            img.src = data.avatar_url;
+          });
+          
+          if (window.showNotification) {
+            window.showNotification(data.message, 'success');
+          }
+          console.log(data.message);
+        } else {
+          if (window.showNotification) {
+            window.showNotification(data.message || 'Ошибка при загрузке аватара', 'error');
+          }
+          console.error(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка:', error);
+      });
+    }
+  });
+  
+  // Сброс аватара
+  const resetButton = document.querySelector('.account-image-reset');
+  resetButton.addEventListener('click', function() {
+    fetch('{% url "user_profile:reset_avatar" %}', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        uploadedAvatar.src = '{% static "frontend/assets/img/avatars/1.png" %}';
+        
+        // Удаляем аватары из навбара и показываем инициалы
+        const navbarAvatars = document.querySelectorAll('.navbar .avatar img');
+        navbarAvatars.forEach(img => {
+          const avatarContainer = img.parentElement;
+          const initials = avatarContainer.querySelector('.avatar-initial');
+          if (initials) {
+            img.style.display = 'none';
+            initials.style.display = 'block';
+          }
+        });
+        
+        if (window.showNotification) {
+          window.showNotification(data.message, 'success');
+        }
+        console.log(data.message);
+      } else {
+        if (window.showNotification) {
+          window.showNotification(data.message || 'Ошибка при сбросе аватара', 'error');
+        }
+        console.error(data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+    });
+  });
+  
+  // AJAX отправка формы
+  const form = document.getElementById('formAccountSettings');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Собираем данные формы в объект
+    const formData = new FormData(form);
+    const data = {};
+    
+    // Преобразуем FormData в обычный объект
+    for (let [key, value] of formData.entries()) {
+      data[key] = value;
+    }
+    
+    console.log('DEBUG: Отправляем данные:', data); // Отладочный вывод
+    
+    fetch('{% url "user_profile:update_profile_ajax" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Показать уведомление об успехе
+        if (window.showNotification) {
+          window.showNotification(data.message, 'success');
+        }
+        console.log(data.message);
+      } else {
+        // Показать уведомление об ошибке
+        if (window.showNotification) {
+          window.showNotification(data.message || 'Произошла ошибка', 'error');
+        }
+        console.error(data.message);
+        if (data.errors) {
+          console.error(data.errors);
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+    });
+  });
+  
+  // Обработка формы изменения пароля
+  const changePasswordForm = document.getElementById('formChangePassword');
+  if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const oldPassword = document.getElementById('old_password').value;
+      const newPassword1 = document.getElementById('new_password1').value;
+      const newPassword2 = document.getElementById('new_password2').value;
+      
+      // Валидация
+      if (newPassword1 !== newPassword2) {
+        alert('Новые пароли не совпадают!');
+        return;
+      }
+      
+      if (newPassword1.length < 8) {
+        alert('Новый пароль должен содержать минимум 8 символов!');
+        return;
+      }
+      
+      // Отправка данных
+      const data = {
+        'old_password': oldPassword,
+        'new_password1': newPassword1,
+        'new_password2': newPassword2
+      };
+      
+      fetch('{% url "user_profile:change_password" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          if (window.showNotification) {
+            window.showNotification(data.message, 'success');
+          }
+          changePasswordForm.reset();
+        } else {
+          if (window.showNotification) {
+            window.showNotification(data.message || 'Ошибка при изменении пароля', 'error');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при изменении пароля');
+      });
+    });
+  }
+  
+  // Загрузка настроек из localStorage
+  loadSettings();
+});
+
+// Функции для работы с настройками
+function loadSettings() {
+  const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+  
+  // Загружаем значения из localStorage
+  Object.keys(settings).forEach(key => {
+    const element = document.getElementById(key);
+    if (element) {
+      if (element.type === 'checkbox') {
+        element.checked = settings[key];
+      } else {
+        element.value = settings[key];
+      }
+    }
+  });
+}
+
+function saveSettings() {
+  const settings = {};
+  
+  // Собираем все настройки
+  const settingElements = document.querySelectorAll('#settings input, #settings select');
+  settingElements.forEach(element => {
+    if (element.type === 'checkbox') {
+      settings[element.id] = element.checked;
+    } else {
+      settings[element.id] = element.value;
+    }
+  });
+  
+  // Используем глобальную функцию сохранения настроек
+  if (window.UserSettings && window.UserSettings.saveSettings) {
+    window.UserSettings.saveSettings(settings);
+  } else {
+    localStorage.setItem('userSettings', JSON.stringify(settings));
+    applySettings(settings);
+    
+    if (window.showNotification) {
+      window.showNotification('Настройки сохранены', 'success');
+    }
+  }
+}
+
+function applySettings(settings) {
+  // Применяем тему
+  if (settings.darkTheme) {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+  
+  // Применяем компактный режим
+  if (settings.compactMode) {
+    document.body.classList.add('compact-mode');
+  } else {
+    document.body.classList.remove('compact-mode');
+  }
+  
+  // Применяем цветные строки заказов
+  if (settings.coloredOrderRows) {
+    document.body.classList.add('colored-order-rows');
+  } else {
+    document.body.classList.remove('colored-order-rows');
+  }
+  
+  // Сохраняем размер страницы по умолчанию
+  if (settings.defaultPageSize) {
+    localStorage.setItem('defaultPageSize', settings.defaultPageSize);
+  }
+}
+
+function resetSettings() {
+  // Используем глобальную функцию сброса настроек
+  if (window.UserSettings && window.UserSettings.resetSettings) {
+    window.UserSettings.resetSettings();
+  } else {
+    if (confirm('Вы уверены, что хотите сбросить все настройки?')) {
+      localStorage.removeItem('userSettings');
+      localStorage.removeItem('defaultPageSize');
+      
+      // Сбрасываем значения к умолчанию
+      const settingElements = document.querySelectorAll('#settings input, #settings select');
+      settingElements.forEach(element => {
+        if (element.type === 'checkbox') {
+          element.checked = element.hasAttribute('checked');
+        } else {
+          element.value = element.querySelector('option[selected]')?.value || '';
+        }
+      });
+      
+      // Убираем примененные стили
+      document.body.classList.remove('dark', 'compact-mode', 'colored-order-rows');
+      
+      if (window.showNotification) {
+        window.showNotification('Настройки сброшены', 'success');
+      }
+    }
+  }
+}
+
+function exportUserData() {
+  // Используем глобальную функцию экспорта данных
+  if (window.UserSettings && window.UserSettings.exportUserData) {
+    window.UserSettings.exportUserData();
+  } else {
+    const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+    const dataStr = JSON.stringify(settings, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = 'user_settings.json';
+    link.click();
+    
+    if (window.showNotification) {
+      window.showNotification('Данные экспортированы', 'success');
+    }
+  }
+}
+
+function clearCache() {
+  // Используем глобальную функцию очистки кэша
+  if (window.UserSettings && window.UserSettings.clearCache) {
+    window.UserSettings.clearCache();
+  } else {
+    if (confirm('Очистить кэш браузера? Это может замедлить загрузку страниц.')) {
+      // Очищаем localStorage (кроме настроек)
+      const settings = localStorage.getItem('userSettings');
+      localStorage.clear();
+      if (settings) {
+        localStorage.setItem('userSettings', settings);
+      }
+      
+      if (window.showNotification) {
+        window.showNotification('Кэш очищен', 'success');
+      }
+    }
+  }
+}
+</script>
+
+<style>
+/* Компактный режим */
+.compact-mode .table td,
+.compact-mode .table th {
+  padding: 0.25rem 0.5rem;
+}
+
+.compact-mode .card-body {
+  padding: 1rem;
+}
+
+.compact-mode .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.compact-mode .form-floating {
+  margin-bottom: 0.5rem;
+}
+
+/* Темная тема */
+.dark {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.dark .card {
+  background-color: #2d2d2d;
+  border-color: #404040;
+}
+
+.dark .form-control,
+.dark .form-select {
+  background-color: #3d3d3d;
+  border-color: #555555;
+  color: #ffffff;
+}
+
+.dark .form-control:focus,
+.dark .form-select:focus {
+  background-color: #3d3d3d;
+  border-color: #007bff;
+  color: #ffffff;
+}
+
+.dark .btn-outline-secondary {
+  border-color: #555555;
+  color: #ffffff;
+}
+
+.dark .btn-outline-secondary:hover {
+  background-color: #555555;
+  border-color: #555555;
+  color: #ffffff;
+}
+
+.dark .text-body-secondary {
+  color: #aaaaaa !important;
+}
+
+.dark .border {
+  border-color: #404040 !important;
+}
+
+.dark .form-check-input:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.dark .form-check-input {
+  background-color: #3d3d3d;
+  border-color: #555555;
+}
+
+/* Управление цветными строками заказов */
+.colored-order-rows .table tbody tr.status-new {
+  background-color: #e3f2fd !important;
+}
+
+.colored-order-rows .table tbody tr.status-new-paid {
+  background-color: #e8f5e8 !important;
+}
+
+.colored-order-rows .table tbody tr.status-processing {
+  background-color: #fff3e0 !important;
+}
+
+.colored-order-rows .table tbody tr.status-shipped {
+  background-color: #f3e5f5 !important;
+}
+
+.colored-order-rows .table tbody tr.status-delivered {
+  background-color: #e8f5e8 !important;
+}
+
+.colored-order-rows .table tbody tr.status-cancelled {
+  background-color: #ffebee !important;
+}
+
+.colored-order-rows .table tbody tr.status-refunded {
+  background-color: #fce4ec !important;
+}
+
+.colored-order-rows .table tbody tr.status-pending {
+  background-color: #fff8e1 !important;
+}
+
+.colored-order-rows .table tbody tr.status-confirmed {
+  background-color: #e0f2f1 !important;
+}
+
+.colored-order-rows .table tbody tr.status-on-hold {
+  background-color: #f1f8e9 !important;
+}
+
+/* Если цветные строки отключены - все строки белые */
+.table tbody tr:not(.colored-order-rows) {
+  background-color: #ffffff !important;
+}
+
+/* Темная тема для цветных строк */
+.dark.colored-order-rows .table tbody tr.status-new {
+  background-color: #1a237e !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-new-paid {
+  background-color: #1b5e20 !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-processing {
+  background-color: #e65100 !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-shipped {
+  background-color: #4a148c !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-delivered {
+  background-color: #1b5e20 !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-cancelled {
+  background-color: #b71c1c !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-refunded {
+  background-color: #880e4f !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-pending {
+  background-color: #f57f17 !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-confirmed {
+  background-color: #00695c !important;
+}
+
+.dark.colored-order-rows .table tbody tr.status-on-hold {
+  background-color: #33691e !important;
+}
+</style>
+{% endblock %}

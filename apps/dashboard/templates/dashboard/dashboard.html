@@ -1,0 +1,534 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - CRM система{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <!-- Period Filter Buttons -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-end">
+        <div class="btn-group" role="group" aria-label="Period filter">
+          <input type="radio" class="btn-check" name="period" id="period-1day" value="1day" {% if active_period == '1day' %}checked{% endif %}>
+          <label class="btn btn-outline-primary" for="period-1day">1 день</label>
+          
+          <input type="radio" class="btn-check" name="period" id="period-7days" value="7days" {% if active_period == '7days' %}checked{% endif %}>
+          <label class="btn btn-outline-primary" for="period-7days">7 дней</label>
+          
+          <input type="radio" class="btn-check" name="period" id="period-1month" value="1month" {% if active_period == '1month' %}checked{% endif %}>
+          <label class="btn btn-outline-primary" for="period-1month">1 месяц</label>
+          
+          <input type="radio" class="btn-check" name="period" id="period-quarter" value="quarter" {% if active_period == 'quarter' %}checked{% endif %}>
+          <label class="btn btn-outline-primary" for="period-quarter">Квартал</label>
+          
+          <input type="radio" class="btn-check" name="period" id="period-halfyear" value="halfyear" {% if active_period == 'halfyear' %}checked{% endif %}>
+          <label class="btn btn-outline-primary" for="period-halfyear">Полгода</label>
+          
+          <input type="radio" class="btn-check" name="period" id="period-year" value="year" {% if active_period == 'year' %}checked{% endif %}>
+          <label class="btn btn-outline-primary" for="period-year">Год</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--/ Period Filter Buttons -->
+  
+  <div class="row gy-6">
+    <!-- Congratulations card -->
+    <div class="col-xl-8 col-lg-7 align-self-end mt-md-7 mt-lg-4 pt-md-2 pt-lg-0">
+      <div class="card">
+        <div class="row">
+          <div class="col-12 col-md-6">
+            <div class="card-body">
+              <h4 class="card-title mb-9 text-truncate">Добро пожаловать <span class="fw-bold">{{ user.first_name|default:user.username }}!</span>🎉</h4>
+              <p class="mb-0">Вы успешно вошли в CRM систему. Управляйте заказами, клиентами и справочниками с легкостью.</p>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 position-relative text-center">
+            <img src="{% static 'frontend/assets/img/illustrations/man-with-laptop-light.png' %}" class="card-img-position bottom-0 w-auto end-0 scaleX-n1-rtl" alt="Dashboard" height="140">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Congratulations card -->
+    
+    <!-- Cards with icon profit and loss info -->
+    <div class="col-xl-4 col-lg-5">
+      <div class="row g-6">
+        <div class="col-sm-6">
+          <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <div class="avatar">
+                <div class="avatar-initial bg-success rounded-circle shadow-xs">
+                  <i class="icon-base ri ri-money-dollar-circle-line icon-24px"></i>
+                </div>
+              </div>
+              <div class="dropdown">
+                <button class="btn text-body-secondary p-0" type="button" id="revenueID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="icon-base ri ri-more-2-line icon-24px"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="revenueID">
+                  <a class="dropdown-item waves-effect" href="{% url 'orders:orders_list' %}">Перейти к заказам</a>
+                  <a class="dropdown-item waves-effect" href="{% url 'orders:add_order' %}">Создать заказ</a>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h6 class="mb-1">Выручка</h6>
+              <div class="d-flex flex-wrap mb-1 align-items-center">
+                <h4 class="mb-0 me-2">₸{{ revenue|floatformat:0 }}</h4>
+                <p class="text-success mb-0">+0%</p>
+              </div>
+              <small>За выбранный период</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+              <div class="avatar">
+                <div class="avatar-initial bg-primary rounded-circle shadow-xs">
+                  <i class="icon-base ri ri-shopping-cart-line icon-24px"></i>
+                </div>
+              </div>
+              <div class="dropdown">
+                <button class="btn text-body-secondary p-0" type="button" id="ordersID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="icon-base ri ri-more-2-line icon-24px"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="ordersID">
+                  <a class="dropdown-item waves-effect" href="{% url 'orders:orders_list' %}">Все заказы</a>
+                  <a class="dropdown-item waves-effect" href="{% url 'orders:add_order' %}">Новый заказ</a>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <h6 class="mb-1">Заказы</h6>
+              <div class="d-flex flex-wrap mb-1 align-items-center">
+                <h4 class="mb-0 me-2">{{ orders_count }}</h4>
+                <p class="text-success mb-0">+0%</p>
+              </div>
+              <small>За выбранный период</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Cards with icon profit and loss info -->
+
+    <!-- Statistics Cards -->
+    <div class="col-xl-4 col-lg-5 col-md-6 col-12 mb-4">
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-info rounded-circle shadow-xs">
+              <i class="icon-base ri ri-user-line icon-24px"></i>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn text-body-secondary p-0" type="button" id="customersID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="icon-base ri ri-more-2-line icon-24px"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="customersID">
+              <a class="dropdown-item waves-effect" href="{% url 'clients:clients_list' %}">Все клиенты</a>
+              <a class="dropdown-item waves-effect" href="{% url 'clients:add_client' %}">Добавить клиента</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="mb-1">Клиенты</h6>
+          <div class="d-flex flex-wrap mb-1 align-items-center">
+            <h4 class="mb-0 me-2">{{ clients_count }}</h4>
+            <p class="text-success mb-0">+0%</p>
+          </div>
+          <small>Новых за период</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5 col-md-6 col-12 mb-4">
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-warning rounded-circle shadow-xs">
+              <i class="icon-base ri ri-box-3-line icon-24px"></i>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn text-body-secondary p-0" type="button" id="productsID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="icon-base ri ri-more-2-line icon-24px"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="productsID">
+              <a class="dropdown-item waves-effect" href="{% url 'products:products_list' %}">Все товары</a>
+              <a class="dropdown-item waves-effect" href="{% url 'products:add_product' %}">Добавить товар</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="mb-1">Товары</h6>
+          <div class="d-flex flex-wrap mb-1 align-items-center">
+            <h4 class="mb-0 me-2">{{ products_count }}</h4>
+            <p class="text-success mb-0">+0%</p>
+          </div>
+          <small>В каталоге</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5 col-md-6 col-12 mb-4">
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="avatar">
+            <div class="avatar-initial bg-secondary rounded-circle shadow-xs">
+              <i class="icon-base ri ri-map-pin-line icon-24px"></i>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn text-body-secondary p-0" type="button" id="citiesID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="icon-base ri ri-more-2-line icon-24px"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="citiesID">
+              <a class="dropdown-item waves-effect" href="{% url 'cities:cities_list' %}">Все города</a>
+              <a class="dropdown-item waves-effect" href="{% url 'cities:add_city' %}">Добавить город</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="mb-1">Города</h6>
+          <div class="d-flex flex-wrap mb-1 align-items-center">
+            <h4 class="mb-0 me-2">{{ cities_count }}</h4>
+            <p class="text-success mb-0">+0%</p>
+          </div>
+          <small>В справочнике</small>
+        </div>
+      </div>
+    </div>
+    <!--/ Statistics Cards -->
+
+    <!-- Total Sales Chart -->
+    <div class="col-xl-4 col-lg-5 col-md-6 col-12 mb-4">
+      <div class="card h-100">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap">
+          <div class="me-3">
+            <h5 class="mb-1">Общие продажи</h5>
+            <p class="mb-3">По статусам заказов</p>
+            <div class="d-flex align-items-center">
+              <h4 class="mb-0 me-1">₸{{ revenue|floatformat:0 }}</h4>
+              <p class="text-success mb-0"><i class="icon-base ri ri-arrow-up-s-line icon-24px"></i>+0%</p>
+            </div>
+          </div>
+          <div id="totalSalesDonutChart" class="mt-3 mt-md-0" style="min-height: 97px;" 
+               data-labels='{{ status_labels|safe }}' 
+               data-values='{{ status_values|safe }}' 
+               data-colors='{{ status_colors|safe }}'></div>
+        </div>
+      </div>
+    </div>
+    <!--/ Total Sales Chart -->
+
+    <!-- Quick Actions -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Быстрые действия</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-3">
+                  <div class="avatar-initial bg-primary rounded-circle">
+                    <i class="icon-base ri ri-add-line"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">Создать заказ</h6>
+                  <small class="text-body-secondary">Добавить новый заказ</small>
+                </div>
+                <a href="{% url 'orders:add_order' %}" class="btn btn-sm btn-outline-primary">Создать</a>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-3">
+                  <div class="avatar-initial bg-info rounded-circle">
+                    <i class="icon-base ri ri-user-add-line"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">Добавить клиента</h6>
+                  <small class="text-body-secondary">Новый клиент в систему</small>
+                </div>
+                <a href="{% url 'clients:add_client' %}" class="btn btn-sm btn-outline-info">Добавить</a>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-3">
+                  <div class="avatar-initial bg-warning rounded-circle">
+                    <i class="icon-base ri ri-box-3-line"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">Добавить товар</h6>
+                  <small class="text-body-secondary">Новый товар в каталог</small>
+                </div>
+                <a href="{% url 'products:add_product' %}" class="btn btn-sm btn-outline-warning">Добавить</a>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-3">
+                  <div class="avatar-initial bg-secondary rounded-circle">
+                    <i class="icon-base ri ri-map-pin-add-line"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-0">Добавить город</h6>
+                  <small class="text-body-secondary">Новый город в справочник</small>
+                </div>
+                <a href="{% url 'cities:add_city' %}" class="btn btn-sm btn-outline-secondary">Добавить</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Quick Actions -->
+
+    <!-- Recent Activity -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Последняя активность</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="mb-3">Последние заказы</h6>
+              {% if recent_orders %}
+                {% for order in recent_orders %}
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-sm me-3">
+                      <div class="avatar-initial bg-success rounded-circle">
+                        <i class="icon-base ri ri-shopping-cart-line"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0">Заказ №{{ order.order_number }}</h6>
+                      <small class="text-body-secondary">{{ order.client }} • {{ order.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <span class="badge bg-label-primary">{{ order.get_status_display }}</span>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="d-flex align-items-center mb-4">
+                  <div class="avatar avatar-sm me-3">
+                    <div class="avatar-initial bg-success rounded-circle">
+                      <i class="icon-base ri ri-shopping-cart-line"></i>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0">Нет заказов</h6>
+                    <small class="text-body-secondary">Заказы будут отображаться здесь</small>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <h6 class="mb-3">Последние клиенты</h6>
+              {% if recent_clients %}
+                {% for client in recent_clients %}
+                  <div class="d-flex align-items-center mb-3">
+                    <div class="avatar avatar-sm me-3">
+                      <div class="avatar-initial bg-info rounded-circle">
+                        <i class="icon-base ri ri-user-line"></i>
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h6 class="mb-0">{{ client }}</h6>
+                      <small class="text-body-secondary">{{ client.get_client_type_display }} • {{ client.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <span class="badge bg-label-info">{{ client.get_client_type_display }}</span>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="d-flex align-items-center mb-4">
+                  <div class="avatar avatar-sm me-3">
+                    <div class="avatar-initial bg-info rounded-circle">
+                      <i class="icon-base ri ri-user-line"></i>
+                    </div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-0">Нет клиентов</h6>
+                    <small class="text-body-secondary">Клиенты будут отображаться здесь</small>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Recent Activity -->
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@latest"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем, загрузилась ли ApexCharts
+    if (typeof ApexCharts === 'undefined') {
+        console.error('ApexCharts не загружен');
+        return;
+    }
+    console.log('ApexCharts загружен успешно');
+    
+    // Обработка переключения периодов
+    const periodInputs = document.querySelectorAll('input[name="period"]');
+    periodInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.checked) {
+                const url = new URL(window.location);
+                url.searchParams.set('period', this.value);
+                window.location.href = url.toString();
+            }
+        });
+    });
+
+    // Создание диаграммы Total Sales
+    const totalSalesChart = document.querySelector("#totalSalesDonutChart");
+    if (totalSalesChart) {
+        // Читаем данные из data-атрибутов
+        const statusLabels = JSON.parse(totalSalesChart.dataset.labels || '[]');
+        const statusValues = JSON.parse(totalSalesChart.dataset.values || '[]');
+        const statusColors = JSON.parse(totalSalesChart.dataset.colors || '[]');
+        
+        // Отладочная информация
+        console.log('Status Labels:', statusLabels);
+        console.log('Status Values:', statusValues);
+        console.log('Status Colors:', statusColors);
+        console.log('Labels type:', typeof statusLabels);
+        console.log('Values type:', typeof statusValues);
+        console.log('Colors type:', typeof statusColors);
+        
+        // Преобразуем статусы в читаемые названия
+        const statusNames = {
+            'new': 'Новые',
+            'new_paid': 'Новые оплаченные',
+            'reserve': 'Резерв',
+            'transfer': 'Перемещение',
+            'delivery': 'Доставка',
+            'callback': 'Перезвонить',
+            'completed': 'Выполненные',
+            'refund': 'Возврат',
+            'cancelled': 'Отмененные'
+        };
+        
+        const labels = statusLabels.map(label => statusNames[label] || label);
+        
+        // Проверяем, есть ли данные для диаграммы
+        if (statusValues.length === 0 || statusValues.every(val => val === 0)) {
+            console.log('Нет данных для диаграммы');
+            totalSalesChart.innerHTML = '<div class="text-center text-muted">Нет данных</div>';
+            return;
+        }
+        
+        const options = {
+            chart: {
+                height: 100,
+                width: 110,
+                parentHeightOffset: 0,
+                type: "donut"
+            },
+            labels: labels,
+            series: statusValues,
+            colors: statusColors,
+            stroke: {
+                width: 5,
+                colors: ['#fff']
+            },
+            tooltip: {
+                show: false,
+                theme: 'light'
+            },
+            dataLabels: {
+                enabled: false,
+                formatter: function (val, opts) {
+                    return parseInt(val) + "%"
+                }
+            },
+            grid: {
+                padding: {
+                    top: -10,
+                    right: -10,
+                    left: -10,
+                    bottom: -5
+                }
+            },
+            legend: {
+                show: false
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: "75%",
+                        labels: {
+                            show: true,
+                            value: {
+                                fontSize: "1.15rem",
+                                fontFamily: "Inter",
+                                color: "var(--bs-heading-color)",
+                                fontWeight: 500,
+                                offsetY: -18,
+                                formatter: function (val) {
+                                    return parseInt(val) + "%"
+                                }
+                            },
+                            name: {
+                                offsetY: 18,
+                                fontFamily: "Inter"
+                            },
+                            total: {
+                                label: "",
+                                label: "Всего",
+                                show: true,
+                                fontSize: "0.75rem",
+                                color: "var(--bs-body-color)",
+                                fontWeight: 400,
+                                formatter: function (w) {
+                                    return "100%"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            states: {
+                hover: {
+                    filter: {
+                        type: "none"
+                    }
+                },
+                active: {
+                    filter: {
+                        type: "none"
+                    }
+                }
+            }
+        };
+        
+        try {
+            new ApexCharts(totalSalesChart, options).render();
+            console.log('Диаграмма создана успешно');
+        } catch (error) {
+            console.error('Ошибка создания диаграммы:', error);
+            totalSalesChart.innerHTML = '<div class="text-center text-danger">Ошибка загрузки диаграммы</div>';
+        }
+    } else {
+        console.log('Элемент totalSalesDonutChart не найден');
+    }
+});
+</script>
+{% endblock %}
