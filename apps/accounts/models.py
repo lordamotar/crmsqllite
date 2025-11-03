@@ -166,7 +166,7 @@ class User(AbstractUser):
 
     def get_subordinates(self):
         """Получить всех подчиненных"""
-        return self.subordinates.filter(active=True)
+        return self.subordinates.filter(is_active=True)
 
     def get_manager_chain(self):
         """Получить цепочку начальников до самого верха"""

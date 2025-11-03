@@ -8,12 +8,14 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password
 from .models import UserProfile
 from .forms import UserProfileForm
+from apps.plans.models import PlanAssignment
 import json
+from decimal import Decimal
 
 User = get_user_model()
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def profile_settings(request):
     """Настройки профиля пользователя"""
     try:
@@ -42,13 +44,55 @@ def profile_settings(request):
     else:
         form = UserProfileForm(instance=profile, user=request.user)
 
+    # Получаем планы менеджера, сгруппированные по месяцам
+    assignments = PlanAssignment.objects.filter(
+        manager=request.user
+    ).select_related('plan').order_by('-plan__start_date', '-plan__created_at')
+    
+    # Группируем по месяцам (используем start_date плана)
+    # Месяцы на русском
+    month_names_ru = {
+        1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель',
+        5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август',
+        9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь'
+    }
+    
+    plans_by_month = {}
+    for assignment in assignments:
+        plan = assignment.plan
+        month_key = plan.start_date.strftime('%Y-%m')
+        month_name_ru = month_names_ru.get(plan.start_date.month, plan.start_date.strftime('%B'))
+        month_display = f"{month_name_ru} {plan.start_date.year}"
+        
+        # Рассчитываем проценты выполнения
+        count_percent = (Decimal(assignment.achieved_count) / Decimal(assignment.target_count) * 100) if assignment.target_count > 0 else Decimal(0)
+        sum_percent = (assignment.achieved_sum / assignment.target_sum * 100) if assignment.target_sum > 0 else Decimal(0)
+        
+        if month_key not in plans_by_month:
+            plans_by_month[month_key] = {
+                'month_name': month_display,
+                'month_key': month_key,
+                'plans': []
+            }
+        
+        plans_by_month[month_key]['plans'].append({
+            'assignment': assignment,
+            'plan': plan,
+            'count_percent': count_percent,
+            'sum_percent': sum_percent,
+        })
+    
+    # Сортируем месяцы по убыванию
+    sorted_months = sorted(plans_by_month.items(), key=lambda x: x[0], reverse=True)
+
     return render(request, 'user_profile/profile_settings.html', {
         'form': form,
-        'profile': profile
+        'profile': profile,
+        'plans_by_month': dict(sorted_months),
     })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_profile_ajax(request):
@@ -88,7 +132,7 @@ def update_profile_ajax(request):
         })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 @csrf_exempt
 @require_http_methods(["POST"])
 def upload_avatar(request):
@@ -114,7 +158,7 @@ def upload_avatar(request):
         })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 @csrf_exempt
 @require_http_methods(["POST"])
 def reset_avatar(request):
@@ -130,7 +174,7 @@ def reset_avatar(request):
     })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 @csrf_exempt
 @require_http_methods(["POST"])
 def change_password(request):

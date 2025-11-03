@@ -6,11 +6,8 @@ def set_default_role(apps, schema_editor):
     User = apps.get_model('accounts', 'User')
     Role = apps.get_model('accounts', 'Role')
     
-    # Получаем или создаем роль admin
-    admin_role, _ = Role.objects.get_or_create(
-        name='admin',
-        defaults={'description': 'Администратор системы'}
-    )
+    # Получаем роль admin
+    admin_role = Role.objects.get(name='admin')
     
     # Назначаем роль всем пользователям без роли
     User.objects.filter(role__isnull=True).update(role=admin_role)

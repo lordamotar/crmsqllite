@@ -10,10 +10,11 @@ from django.core.paginator import Paginator
 import os
 import tempfile
 from .models import Product
+from django.db import models
 from apps.cities.models import City
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def products_list(request):
     """Список всех товаров"""
     sort_by = request.GET.get('sort', '-created_at')
@@ -43,6 +44,13 @@ def products_list(request):
         .order_by(sort_field)
     )
 
+    # Поиск по коду и названию
+    search_query = (request.GET.get('search') or '').strip()
+    if search_query:
+        products_queryset = products_queryset.filter(
+            models.Q(code__icontains=search_query) | models.Q(name__icontains=search_query)
+        )
+
     # Пагинация
     paginator = Paginator(products_queryset, per_page)
     page_number = request.GET.get('page')
@@ -56,11 +64,12 @@ def products_list(request):
             'current_sort': sort_by,
             'current_order': order,
             'per_page': per_page,
+            'search': search_query,
         },
     )
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def add_product(request):
     """Добавление нового товара"""
     if request.method == 'POST':
@@ -92,7 +101,7 @@ def add_product(request):
     })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def edit_product(request, product_id):
     """Редактирование товара"""
     product = get_object_or_404(Product, id=product_id)
@@ -125,7 +134,7 @@ def edit_product(request, product_id):
     })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def delete_product(request, product_id):
     """Удаление товара"""
     product = get_object_or_404(Product, id=product_id)
@@ -144,7 +153,7 @@ def delete_product(request, product_id):
         })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 @require_http_methods(["POST"])
 def import_products(request):
     """Импорт товаров из Excel файла"""

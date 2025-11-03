@@ -25,6 +25,12 @@ class LoginRequiredMiddleware:
         path = request.path
 
         if request.user.is_authenticated:
+            # Проверяем активность пользователя
+            if not request.user.is_active:
+                from django.contrib.auth import logout
+                logout(request)
+                login_url = resolve_url(getattr(settings, 'LOGIN_URL', 'accounts:login'))
+                return redirect(f"{login_url}?next={quote(path)}")
             return self.get_response(request)
 
         # Разрешаем публичные пути

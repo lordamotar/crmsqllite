@@ -1,5 +1,5 @@
 {% load static %}
-<html lang="ru" class="layout-menu-fixed layout-compact" data-template="vertical-menu-template-free" data-assets-path="{% static 'frontend/assets/' %}">
+<html lang="ru" class="layout-menu-fixed layout-compact layout-navbar-fixed" data-template="vertical-menu-template-free" data-assets-path="{% static 'frontend/assets/' %}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -31,316 +31,8 @@
 
     {% block styles %}{% endblock %}
 
-    <!-- Global Settings Styles -->
-    <style>
-      /* Темная тема */
-      [data-theme="dark"] {
-        --bs-body-bg: #1a1a1a;
-        --bs-body-color: #ffffff;
-        --bs-card-bg: #2d2d2d;
-        --bs-border-color: #404040;
-        --bs-secondary-bg: #3d3d3d;
-        --bs-tertiary-bg: #555555;
-      }
-
-      [data-theme="dark"] body {
-        background-color: var(--bs-body-bg) !important;
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .card {
-        background-color: var(--bs-card-bg) !important;
-        border-color: var(--bs-border-color) !important;
-      }
-
-      [data-theme="dark"] .form-control,
-      [data-theme="dark"] .form-select {
-        background-color: var(--bs-secondary-bg) !important;
-        border-color: var(--bs-tertiary-bg) !important;
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .form-control:focus,
-      [data-theme="dark"] .form-select:focus {
-        background-color: var(--bs-secondary-bg) !important;
-        border-color: #007bff !important;
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .btn-outline-secondary {
-        border-color: var(--bs-tertiary-bg) !important;
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .btn-outline-secondary:hover {
-        background-color: var(--bs-tertiary-bg) !important;
-        border-color: var(--bs-tertiary-bg) !important;
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .text-body-secondary {
-        color: #aaaaaa !important;
-      }
-
-      [data-theme="dark"] .border {
-        border-color: var(--bs-border-color) !important;
-      }
-
-      [data-theme="dark"] .form-check-input:checked {
-        background-color: #007bff !important;
-        border-color: #007bff !important;
-      }
-
-      [data-theme="dark"] .form-check-input {
-        background-color: var(--bs-secondary-bg) !important;
-        border-color: var(--bs-tertiary-bg) !important;
-      }
-
-      [data-theme="dark"] .table {
-        --bs-table-bg: var(--bs-card-bg);
-        --bs-table-color: var(--bs-body-color);
-        --bs-table-border-color: var(--bs-border-color);
-        background-color: var(--bs-card-bg) !important;
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .table td,
-      [data-theme="dark"] .table th {
-        background-color: var(--bs-card-bg) !important;
-        color: var(--bs-body-color) !important;
-        border-color: var(--bs-border-color) !important;
-      }
-
-      [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > td,
-      [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > th {
-        --bs-table-accent-bg: rgba(255, 255, 255, 0.05);
-        background-color: rgba(255, 255, 255, 0.05) !important;
-      }
-
-      [data-theme="dark"] .table-hover tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-      }
-
-      [data-theme="dark"] .navbar {
-        background-color: var(--bs-card-bg) !important;
-        border-color: var(--bs-border-color) !important;
-      }
-
-      [data-theme="dark"] .layout-menu {
-        background-color: var(--bs-card-bg) !important;
-        border-color: var(--bs-border-color) !important;
-      }
-
-      [data-theme="dark"] .menu-item a {
-        color: var(--bs-body-color) !important;
-      }
-
-      [data-theme="dark"] .menu-item a:hover {
-        background-color: var(--bs-secondary-bg) !important;
-      }
-
-      [data-theme="dark"] .menu-item.active > a {
-        background-color: #007bff !important;
-        color: white !important;
-      }
-
-      /* Компактный режим */
-      body.compact-mode .table td,
-      body.compact-mode .table th {
-        padding: 0.25rem 0.5rem !important;
-      }
-
-      body.compact-mode .card-body {
-        padding: 1rem !important;
-      }
-
-      body.compact-mode .btn {
-        padding: 0.25rem 0.5rem !important;
-        font-size: 0.875rem !important;
-      }
-
-      body.compact-mode .form-floating {
-        margin-bottom: 0.5rem !important;
-      }
-
-      /* Цветные строки заказов - только если включены цветные строки */
-      body.colored-order-rows .table tbody tr.status-new {
-        background-color: #C8FACC !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-new-paid {
-        background-color: #A6F3B5 !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-reserve {
-        background-color: #FFF5B1 !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-transfer {
-        background-color: #FFE79E !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-delivery {
-        background-color: #FFD47E !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-callback {
-        background-color: #FFBD6A !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-completed {
-        background-color: #B8E6FF !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-refund {
-        background-color: #9CD2FF !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled {
-        background-color: #FFBDBD !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-no-call {
-        background-color: #FFCCCC !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-year {
-        background-color: #FFB3B3 !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-wrong {
-        background-color: #FF9999 !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-found-other {
-        background-color: #FF8080 !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-delivery {
-        background-color: #FF6666 !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-no-quantity {
-        background-color: #FF4D4D !important;
-      }
-
-      body.colored-order-rows .table tbody tr.status-cancelled-no-set {
-        background-color: #FF3333 !important;
-      }
-
-      /* Если цветные строки отключены - все строки белые в светлой теме */
-      body:not(.colored-order-rows) .table tbody tr {
-        background-color: #ffffff !important;
-      }
-
-      /* В темной теме строки должны быть темными */
-      [data-theme="dark"] body:not(.colored-order-rows) .table tbody tr {
-        background-color: var(--bs-card-bg) !important;
-      }
-
-      /* Темная тема для цветных строк */
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-new {
-        background-color: rgba(26, 35, 126, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-new-paid {
-        background-color: rgba(27, 94, 32, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-reserve {
-        background-color: rgba(230, 81, 0, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-transfer {
-        background-color: rgba(74, 20, 140, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-delivery {
-        background-color: rgba(27, 94, 32, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-callback {
-        background-color: rgba(183, 28, 28, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-completed {
-        background-color: rgba(136, 14, 79, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-refund {
-        background-color: rgba(245, 127, 23, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled {
-        background-color: rgba(0, 105, 92, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-call {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-year {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-wrong {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-found-other {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-delivery {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-quantity {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-
-      [data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-set {
-        background-color: rgba(51, 105, 30, 0.3) !important;
-      }
-    </style>
-
-    <!-- Custom menu styles -->
-    <style>
-      .menu-sub {
-        display: none;
-        padding-left: 1rem;
-      }
-      
-      .menu-item.open .menu-sub {
-        display: block;
-      }
-      
-      .menu-toggle::after {
-        content: '\ea6e';
-        font-family: 'remixicon';
-        float: right;
-        transition: transform 0.3s ease;
-      }
-      
-      .menu-item.open .menu-toggle::after {
-        transform: rotate(90deg);
-      }
-      
-      /* Предотвращаем автоматическое закрытие dropdown */
-      .dropdown-menu {
-        pointer-events: auto;
-      }
-      
-      .dropdown-toggle:focus {
-        box-shadow: none;
-      }
-      
-      /* Убираем автоматическое закрытие при клике вне области */
-      .navbar .dropdown-menu {
-        position: absolute;
-        will-change: transform;
-      }
-    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'frontend/assets/css/custom.css' %}">
 
     <!-- Helpers -->
     <script src="{% static 'frontend/assets/vendor/js/helpers.js' %}"></script>
@@ -373,6 +65,11 @@
             <li class="menu-item"><a href="{% url 'orders:orders_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-table-alt-line"></i><div>Заказы</div></a></li>
             <li class="menu-item"><a href="{% url 'clients:clients_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-user-line"></i><div>Клиенты</div></a></li>
             <li class="menu-item"><a href="{% url 'products:products_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-box-3-line"></i><div>Товары</div></a></li>
+            <li class="menu-item"><a href="{% url 'plans:plans_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-file-list-3-line"></i><div>Планы</div></a></li>
+            
+            {% if user.is_staff %}
+            <li class="menu-item"><a href="{% url 'accounts:users_list' %}" class="menu-link"><i class="menu-icon icon-base ri ri-user-settings-line"></i><div>Пользователи</div></a></li>
+            {% endif %}
             
             <!-- Справочники -->
             <li class="menu-item">
@@ -385,6 +82,29 @@
                   <a href="{% url 'cities:cities_list' %}" class="menu-link">
                     <div>Города</div>
                   </a>
+                </li>
+                <li class="menu-header mt-7">
+                  <span class="menu-header-text">Пользователи</span>
+                </li>
+                {% if user.is_staff %}
+                <li class="menu-item">
+                  <a href="{% url 'accounts:roles_list' %}" class="menu-link">
+                    <div>Роли</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{% url 'accounts:positions_list' %}" class="menu-link">
+                    <div>Должности</div>
+                  </a>
+                </li>
+                <li class="menu-item">
+                  <a href="{% url 'accounts:branches_list' %}" class="menu-link">
+                    <div>Филиалы</div>
+                  </a>
+                </li>
+                {% endif %}
+                <li class="menu-header mt-7">
+                  <span class="menu-header-text">Заказы</span>
                 </li>
                 <li class="menu-item">
                   <a href="/order-sources/" class="menu-link">
@@ -420,7 +140,7 @@
             </div>
 
             <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
-              <!-- Search -->
+              <!-- 
               <div class="navbar-nav align-items-center">
                 <div class="nav-item navbar-search-wrapper mb-0">
                   <a class="nav-item nav-link search-toggler px-0" href="javascript:void(0);">
@@ -430,10 +150,10 @@
                   </a>
                 </div>
               </div>
-              <!-- /Search -->
+          -->
 
               <ul class="navbar-nav flex-row align-items-center ms-md-auto">
-                <!-- Language -->
+                <!-- 
                 <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
                   <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <i class="icon-base ri ri-translate-2 icon-22px"></i>
@@ -451,11 +171,11 @@
                     </li>
                   </ul>
                 </li>
-                <!--/ Language -->
+            -->
 
           <!-- Notification -->
           <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
-            <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill waves-effect" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="false" aria-expanded="false">
+            <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill waves-effect" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
               <span class="position-relative">
                 <i class="icon-base ri ri-notification-2-line icon-22px"></i>
                 <span class="badge rounded-pill bg-danger badge-dot badge-notifications border"></span>
@@ -479,7 +199,9 @@
                     <div class="d-flex">
                       <div class="flex-shrink-0 me-3">
                         <div class="avatar">
-                          <span class="avatar-initial rounded-circle bg-label-success">НЗ</span>
+                          <span class="avatar-initial rounded-circle bg-label-success">
+                            <i class="icon-base ri ri-shopping-cart-line"></i>
+                          </span>
                         </div>
                       </div>
                       <div class="flex-grow-1">
@@ -497,7 +219,9 @@
                     <div class="d-flex">
                       <div class="flex-shrink-0 me-3">
                         <div class="avatar">
-                          <span class="avatar-initial rounded-circle bg-label-warning">СК</span>
+                          <span class="avatar-initial rounded-circle bg-label-warning">
+                            <i class="icon-base ri ri-refresh-line"></i>
+                          </span>
                         </div>
                       </div>
                       <div class="flex-grow-1">
@@ -515,7 +239,9 @@
                     <div class="d-flex">
                       <div class="flex-shrink-0 me-3">
                         <div class="avatar">
-                          <span class="avatar-initial rounded-circle bg-label-info">К</span>
+                          <span class="avatar-initial rounded-circle bg-label-info">
+                            <i class="icon-base ri ri-user-add-line"></i>
+                          </span>
                         </div>
                       </div>
                       <div class="flex-grow-1">
@@ -533,7 +259,9 @@
                     <div class="d-flex">
                       <div class="flex-shrink-0 me-3">
                         <div class="avatar">
-                          <span class="avatar-initial rounded-circle bg-label-danger">!</span>
+                          <span class="avatar-initial rounded-circle bg-label-danger">
+                            <i class="icon-base ri ri-alert-line"></i>
+                          </span>
                         </div>
                       </div>
                       <div class="flex-grow-1">
@@ -549,16 +277,18 @@
                   </li>
                 </ul>
               </li>
-              <li class="dropdown-menu-footer border-top">
-                <a href="javascript:void(0);" class="dropdown-item d-flex justify-content-center text-primary p-2 h6 mb-0 waves-effect">
-                  Просмотреть все уведомления
+              <li class="border-top">
+                <div class="d-grid p-4">
+                  <a class="btn btn-primary btn-sm d-flex h-px-34 waves-effect waves-light" href="javascript:void(0);">
+                    <small class="align-middle">Просмотреть все уведомления</small>
                 </a>
+                </div>
               </li>
             </ul>
           </li>
           <!-- / Notification -->
 
-          <!-- Style Switcher -->
+          <!-- Style Switcher 
           <li class="nav-item dropdown me-sm-2 me-xl-0">
             <a class="nav-link dropdown-toggle hide-arrow btn btn-icon btn-text-secondary rounded-pill waves-effect" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown" aria-label="Toggle theme (light)" aria-expanded="false">
               <i class="ri-sun-line icon-base ri icon-22px theme-icon-active"></i>
@@ -582,7 +312,7 @@
               </li>
             </ul>
           </li>
-          <!-- / Style Switcher-->
+       Style Switcher-->
 
                 <!-- User -->
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -660,12 +390,12 @@
                     <li>
                       <div class="d-grid px-4 pt-2 pb-1">
                         {% if user.is_authenticated %}
-                          <a class="btn btn-danger d-flex waves-effect waves-light" href="{% url 'logout' %}">
+                          <a class="btn btn-danger d-flex waves-effect waves-light" href="{% url 'accounts:logout' %}">
                             <small class="align-middle">Выйти</small>
                             <i class="icon-base ri ri-logout-box-r-line ms-2 icon-16px"></i>
                           </a>
                         {% else %}
-                          <a class="btn btn-primary d-flex waves-effect waves-light" href="{% url 'login' %}">
+                          <a class="btn btn-primary d-flex waves-effect waves-light" href="{% url 'accounts:login' %}">
                             <small class="align-middle">Войти</small>
                             <i class="icon-base ri ri-login-box-line ms-2 icon-16px"></i>
                           </a>
@@ -727,344 +457,8 @@
     <script src="{% static 'frontend/assets/js/main.js' %}"></script>
     <script src="{% static 'frontend/assets/js/settings.js' %}"></script>
 
-    <script>
-      // Обработка сворачивания боковой панели
-      document.addEventListener('DOMContentLoaded', function() {
-        const menuToggles = document.querySelectorAll('.layout-menu-toggle');
-        const overlay = document.querySelector('.layout-overlay');
-        const root = document.documentElement;
-        
-        // Восстанавливаем состояние из localStorage
-        const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
-        if (isCollapsed) {
-          root.classList.add('layout-menu-collapsed');
-        }
-        
-        menuToggles.forEach(function(toggle) {
-          toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            root.classList.toggle('layout-menu-collapsed');
-            
-            // Сохраняем состояние в localStorage
-            const isNowCollapsed = root.classList.contains('layout-menu-collapsed');
-            localStorage.setItem('sidebar-collapsed', isNowCollapsed.toString());
-            
-            // Показываем/скрываем overlay на мобильных устройствах
-            if (window.innerWidth < 1200) {
-              if (isNowCollapsed) {
-                overlay.style.display = 'block';
-                setTimeout(() => overlay.classList.add('show'), 10);
-              } else {
-                overlay.classList.remove('show');
-                setTimeout(() => overlay.style.display = 'none', 300);
-              }
-            }
-          });
-        });
-        
-        // Закрытие меню при клике на overlay
-        if (overlay) {
-          overlay.addEventListener('click', function() {
-            root.classList.remove('layout-menu-collapsed');
-            localStorage.setItem('sidebar-collapsed', 'false');
-            overlay.classList.remove('show');
-            setTimeout(() => overlay.style.display = 'none', 300);
-          });
-        }
-        
-        // Обработка изменения размера окна
-        window.addEventListener('resize', function() {
-          if (window.innerWidth >= 1200) {
-            // На больших экранах убираем overlay
-            if (overlay) {
-              overlay.classList.remove('show');
-              overlay.style.display = 'none';
-            }
-          } else {
-            // На мобильных устройствах показываем overlay если меню открыто
-            if (root.classList.contains('layout-menu-collapsed') && overlay) {
-              overlay.style.display = 'block';
-              setTimeout(() => overlay.classList.add('show'), 10);
-            }
-          }
-        });
-      });
-      
-      // Обработка раскрывающегося меню
-      document.addEventListener('DOMContentLoaded', function() {
-        const menuToggles = document.querySelectorAll('.menu-toggle');
-        menuToggles.forEach(function(toggle) {
-          toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            const menuItem = this.closest('.menu-item');
-            const menuSub = menuItem.querySelector('.menu-sub');
-            
-            if (menuSub) {
-              // Закрываем все другие открытые подменю
-              document.querySelectorAll('.menu-item.open').forEach(function(item) {
-                if (item !== menuItem) {
-                  item.classList.remove('open');
-                }
-              });
-              
-              // Переключаем текущее подменю
-              menuItem.classList.toggle('open');
-            }
-          });
-        });
-
-        // Функционал переключения тем
-        function getStoredTheme() {
-          return localStorage.getItem('theme') || 'light';
-        }
-
-        function setStoredTheme(theme) {
-          localStorage.setItem('theme', theme);
-        }
-
-        function getPreferredTheme() {
-          const stored = getStoredTheme();
-          if (stored !== 'system') {
-            return stored;
-          }
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-
-        function setTheme(theme) {
-          if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-bs-theme', systemTheme);
-          } else {
-            document.documentElement.setAttribute('data-bs-theme', theme);
-          }
-        }
-
-        function showActiveTheme(theme, focus = false) {
-          const themeToggle = document.querySelector('#nav-theme');
-          const themeToggleText = document.querySelector('#nav-theme-text');
-          const themeIcon = document.querySelector('.theme-icon-active');
-          const themeButton = document.querySelector(`[data-bs-theme-value="${theme}"]`);
-          
-          if (themeButton) {
-            const icon = themeButton.querySelector('i').getAttribute('data-icon');
-            
-            // Убираем активный класс со всех кнопок
-            document.querySelectorAll('[data-bs-theme-value]').forEach(function(btn) {
-              btn.classList.remove('active');
-              btn.setAttribute('aria-pressed', 'false');
-            });
-            
-            // Активируем выбранную кнопку
-            themeButton.classList.add('active');
-            themeButton.setAttribute('aria-pressed', 'true');
-            
-            // Обновляем иконку
-            if (themeIcon) {
-              const classes = Array.from(themeIcon.classList).filter(function(cls) {
-                return !cls.startsWith('ri-');
-              });
-              themeIcon.setAttribute('class', `ri-${icon} ${classes.join(' ')}`);
-            }
-            
-            // Обновляем aria-label
-            if (themeToggle && themeToggleText) {
-              const label = `${themeToggleText.textContent} (${theme})`;
-              themeToggle.setAttribute('aria-label', label);
-              if (focus) {
-                themeToggle.focus();
-              }
-            }
-          }
-        }
-
-        // Инициализация темы
-        const currentTheme = getPreferredTheme();
-        setTheme(currentTheme);
-        showActiveTheme(getStoredTheme());
-
-        // Обработчики переключения тем
-        document.querySelectorAll('[data-bs-theme-value]').forEach(function(button) {
-          button.addEventListener('click', function() {
-            const theme = this.getAttribute('data-bs-theme-value');
-            setStoredTheme(theme);
-            setTheme(theme);
-            showActiveTheme(theme, true);
-          });
-        });
-
-    // Слушаем изменения системной темы
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
-      const stored = getStoredTheme();
-      if (stored === 'system') {
-        setTheme('system');
-      }
-    });
-
-    // Система уведомлений в dropdown
-    function addNotificationToDropdown(message, type = 'success') {
-      const notificationsList = document.querySelector('.dropdown-notifications-list ul');
-      if (!notificationsList) return;
-
-      // Определяем иконку и цвет в зависимости от типа
-      let icon, bgClass, avatarText;
-      switch(type) {
-        case 'success':
-          icon = 'ri-check-line';
-          bgClass = 'bg-label-success';
-          avatarText = '✓';
-          break;
-        case 'error':
-          icon = 'ri-error-warning-line';
-          bgClass = 'bg-label-danger';
-          avatarText = '!';
-          break;
-        case 'warning':
-          icon = 'ri-alert-line';
-          bgClass = 'bg-label-warning';
-          avatarText = '⚠';
-          break;
-        case 'info':
-          icon = 'ri-information-line';
-          bgClass = 'bg-label-info';
-          avatarText = 'i';
-          break;
-        default:
-          icon = 'ri-notification-line';
-          bgClass = 'bg-label-primary';
-          avatarText = 'N';
-      }
-
-      // Создаем HTML для нового уведомления
-      const notificationHTML = `
-        <li class="list-group-item list-group-item-action dropdown-notifications-item waves-effect">
-          <div class="d-flex">
-            <div class="flex-shrink-0 me-3">
-              <div class="avatar">
-                <span class="avatar-initial rounded-circle ${bgClass}">${avatarText}</span>
-              </div>
-            </div>
-            <div class="flex-grow-1">
-              <h6 class="small mb-50">Системное уведомление</h6>
-              <small class="mb-1 d-block text-body">${message}</small>
-              <small class="text-body-secondary">только что</small>
-            </div>
-            <div class="flex-shrink-0 dropdown-notifications-actions">
-              <a href="javascript:void(0)" class="dropdown-notifications-read"> <span class="badge badge-dot"></span></a>
-              <a href="javascript:void(0)" class="dropdown-notifications-archive"> <span class="icon-base ri ri-close-line"></span></a>
-            </div>
-          </div>
-        </li>
-      `;
-
-      // Добавляем уведомление в начало списка
-      notificationsList.insertAdjacentHTML('afterbegin', notificationHTML);
-
-      // Обновляем счетчик новых уведомлений
-      updateNotificationCount();
-
-      // Добавляем обработчики для новых кнопок
-      const newNotification = notificationsList.firstElementChild;
-      addNotificationHandlers(newNotification);
-    }
-
-    // Функция обновления счетчика уведомлений
-    function updateNotificationCount() {
-      const unreadNotifications = document.querySelectorAll('.dropdown-notifications-item:not(.marked-as-read)');
-      const count = unreadNotifications.length;
-      
-      const badge = document.querySelector('.badge-notifications');
-      if (badge) {
-        badge.style.display = count > 0 ? 'block' : 'none';
-      }
-      
-      const newBadge = document.querySelector('.badge.bg-label-primary');
-      if (newBadge) {
-        newBadge.textContent = count > 0 ? `${count} Новых` : '0 Новых';
-      }
-    }
-
-    // Добавление обработчиков для новых уведомлений
-    function addNotificationHandlers(notificationElement) {
-      // Отметить как прочитанное
-      const readBtn = notificationElement.querySelector('.dropdown-notifications-read');
-      if (readBtn) {
-        readBtn.addEventListener('click', function() {
-          if (!notificationElement.classList.contains('marked-as-read')) {
-            notificationElement.classList.add('marked-as-read');
-            updateNotificationCount();
-          }
-        });
-      }
-
-      // Удалить уведомление
-      const archiveBtn = notificationElement.querySelector('.dropdown-notifications-archive');
-      if (archiveBtn) {
-        archiveBtn.addEventListener('click', function() {
-          notificationElement.remove();
-          updateNotificationCount();
-        });
-      }
-    }
-
-    // Глобальная функция для показа уведомлений
-    window.showNotification = addNotificationToDropdown;
-
-    // Обработка уведомлений
-    document.addEventListener('DOMContentLoaded', function() {
-      // Отключаем автоматическое закрытие dropdown при клике вне их области
-      document.addEventListener('click', function(e) {
-        // Если клик не по dropdown элементу, не закрываем dropdown
-        if (!e.target.closest('.dropdown')) {
-          return;
-        }
-      });
-
-      // Предотвращаем закрытие dropdown при открытии других dropdown
-      const allDropdownToggles = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-      allDropdownToggles.forEach(function(toggle) {
-        toggle.addEventListener('click', function(e) {
-          e.stopPropagation();
-        });
-      });
-
-      // Отключаем автоматическое закрытие dropdown при клике вне области
-      document.addEventListener('click', function(e) {
-        // Если клик по элементу навбара, не закрываем dropdown
-        if (e.target.closest('.navbar')) {
-          return;
-        }
-      });
-
-      // Отметить все как прочитанные
-      const markAllReadBtn = document.querySelector('.dropdown-notifications-all');
-      if (markAllReadBtn) {
-        markAllReadBtn.addEventListener('click', function() {
-          const notifications = document.querySelectorAll('.dropdown-notifications-item');
-          notifications.forEach(function(notification) {
-            notification.classList.add('marked-as-read');
-          });
-          
-          // Обновляем счетчик
-          const badge = document.querySelector('.badge-notifications');
-          if (badge) {
-            badge.style.display = 'none';
-          }
-          
-          const newBadge = document.querySelector('.badge.bg-label-primary');
-          if (newBadge) {
-            newBadge.textContent = '0 Новых';
-          }
-        });
-      }
-
-      // Добавляем обработчики для существующих уведомлений
-      const existingNotifications = document.querySelectorAll('.dropdown-notifications-item');
-      existingNotifications.forEach(function(notification) {
-        addNotificationHandlers(notification);
-      });
-    });
-      });
-    </script>
+    <!-- Custom JS -->
+    <script src="{% static 'frontend/assets/js/base.js' %}"></script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

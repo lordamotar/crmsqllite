@@ -1,6 +1,6 @@
 # CRM Project-A — Django/DRF + Bootstrap
 
-**Статус:** Backend готов, Frontend на Bootstrap, база — SQLite по умолчанию, JWT авторизация реализована.
+**Статус:** Backend готов, Frontend на Bootstrap, PostgreSQL как единственный источник данных, JWT авторизация реализована.
 
 **Текущая версия:** v1.0 - Полнофункциональная CRM система для обработки заказов с автоматическим заполнением полей товаров.
 
@@ -8,7 +8,7 @@
 
 ## Технический стек
 - **Backend:** Django 5.2.6 + Django REST Framework
-- **База данных:** SQLite (локальная, файл `db.sqlite3`)
+- **База данных:** PostgreSQL (локальная)
 - **Авторизация:** Django Auth + JWT (роли: admin, manager, accountant)
 - **Frontend:** Bootstrap 5 + JavaScript (AJAX)
 - **Кэширование:** Django LocMemCache
@@ -35,7 +35,12 @@ pip install -r requirements.txt
 ```
 
 ### 2. Настройка базы данных
-Ничего настраивать не нужно: используется SQLite. Файл БД будет создан автоматически в корне проекта (`db.sqlite3`).
+Создайте PostgreSQL базу данных:
+```sql
+CREATE DATABASE projecta_db;
+CREATE USER aikos_super WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE projecta_db TO aikos_super;
+```
 
 ### 3. Миграции
 ```bash
@@ -43,14 +48,8 @@ python manage.py migrate
 ```
 
 ### 4. Создание суперпользователя
-Интерактивно:
 ```bash
 python manage.py createsuperuser
-```
-
-Неинтерактивно (пример):
-```bash
-python manage.py shell -c "from apps.accounts.models import User, Role; Role.objects.get_or_create(name='admin', defaults={'description':'Администратор системы'}); User.objects.create_superuser(email='admin@example.com', username='admin', password='admin123')"
 ```
 
 ### 5. Запуск сервера

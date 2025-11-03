@@ -1,17 +1,20 @@
 {% extends 'base.html' %}
-{% block title %}Редактировать пользователя{% endblock %}
+{% block title %}Редактировать пользователя - CRM{% endblock %}
 {% block content %}
-<div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Редактировать пользователя</h5>
-    <div class="text-end">
-      <label class="form-label me-3 mb-0">Активность аккаунта</label>
-      <div class="form-check form-switch mb-0 d-inline-block align-middle">
-        <input type="checkbox" class="form-check-input" name="is_active" value="on" {% if u.is_active %}checked{% endif %}>
-      </div>
-    </div>
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Редактирование пользователя</h4>
+    <a href="{% url 'accounts:users_list' %}" class="btn btn-label-secondary">
+      <i class="icon-base ri ri-arrow-left-line me-1"></i>
+      Назад к списку
+    </a>
   </div>
-  <div class="card-body">
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">{{ u.short_name }}</h5>
+    </div>
+    <div class="card-body">
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">{{ message }}</div>
@@ -19,6 +22,29 @@
     {% endif %}
     <form method="post">
       {% csrf_token %}
+      <!-- Чекбоксы активности - внутри формы -->
+      <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center">
+          <label class="form-label me-3 mb-0">Активность аккаунта</label>
+          <div class="form-check form-switch mb-0">
+            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="on" {% if u.is_active %}checked{% endif %}>
+          </div>
+        </div>
+        {% if can_set_password %}
+        <div class="d-flex align-items-center">
+          <label class="form-label me-3 mb-0">Персонал</label>
+          <div class="form-check form-switch mb-0">
+            <input type="checkbox" class="form-check-input" id="is_staff" name="is_staff" value="on" {% if u.is_staff %}checked{% endif %}>
+          </div>
+        </div>
+        <div class="d-flex align-items-center">
+          <label class="form-label me-3 mb-0">Суперпользователь</label>
+          <div class="form-check form-switch mb-0">
+            <input type="checkbox" class="form-check-input" id="is_superuser" name="is_superuser" value="on" {% if u.is_superuser %}checked{% endif %}>
+          </div>
+        </div>
+        {% endif %}
+      </div>
       <div class="row g-5">
         <div class="col-md-6">
           <div class="form-floating form-floating-outline mb-5">
@@ -52,12 +78,60 @@
           </div>
         </div>
         {% endif %}
+        <div class="col-md-6">
+          <div class="form-floating form-floating-outline mb-5">
+            <select class="form-select" id="role" name="role" required>
+              <option value="">Выберите роль</option>
+              {% for role in roles %}
+                <option value="{{ role.id }}" {% if u.role and u.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="role">Роль <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating form-floating-outline mb-5">
+            <select class="form-select" id="position" name="position">
+              <option value="">Выберите должность</option>
+              {% for position in positions %}
+                <option value="{{ position.id }}" {% if u.position and u.position.id == position.id %}selected{% endif %}>{{ position.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="position">Должность</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating form-floating-outline mb-5">
+            <select class="form-select" id="branch" name="branch">
+              <option value="">Выберите филиал</option>
+              {% for branch in branches %}
+                <option value="{{ branch.id }}" {% if u.branch and u.branch.id == branch.id %}selected{% endif %}>{{ branch.name }} ({{ branch.city }})</option>
+              {% endfor %}
+            </select>
+            <label for="branch">Филиал</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating form-floating-outline mb-5">
+            <select class="form-select" id="manager" name="manager">
+              <option value="">Выберите начальника</option>
+              {% for manager in managers %}
+                <option value="{{ manager.id }}" {% if u.manager and u.manager.id == manager.id %}selected{% endif %}>{{ manager.short_name }}</option>
+              {% endfor %}
+            </select>
+            <label for="manager">Начальник</label>
+          </div>
+        </div>
       </div>
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary me-3">Сохранить</button>
-        <a href="{% url 'accounts:users_list' %}" class="btn btn-outline-secondary">Отмена</a>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <a href="{% url 'accounts:users_list' %}" class="btn btn-label-secondary">Отмена</a>
+        <button type="submit" class="btn btn-primary">
+          <i class="ri-save-line me-1"></i>
+          Сохранить изменения
+        </button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 {% endblock %}

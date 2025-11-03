@@ -1,0 +1,383 @@
+/* Динамический навбар при прокрутке */
+.layout-page.window-scrolled .layout-navbar.navbar-detached {
+  box-shadow: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
+}
+
+/* Темная тема */
+[data-theme="dark"] {
+  --bs-body-bg: #1a1a1a;
+  --bs-body-color: #ffffff;
+  --bs-card-bg: #2d2d2d;
+  --bs-border-color: #404040;
+  --bs-secondary-bg: #3d3d3d;
+  --bs-tertiary-bg: #555555;
+}
+
+[data-theme="dark"] body {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .card {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-tertiary-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: #007bff !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+  border-color: var(--bs-tertiary-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .btn-outline-secondary:hover {
+  background-color: var(--bs-tertiary-bg) !important;
+  border-color: var(--bs-tertiary-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .text-body-secondary {
+  color: #aaaaaa !important;
+}
+
+[data-theme="dark"] .border {
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-theme="dark"] .form-check-input:checked {
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+}
+
+[data-theme="dark"] .form-check-input {
+  background-color: var(--bs-secondary-bg) !important;
+  border-color: var(--bs-tertiary-bg) !important;
+}
+
+[data-theme="dark"] .table {
+  --bs-table-bg: var(--bs-card-bg);
+  --bs-table-color: var(--bs-body-color);
+  --bs-table-border-color: var(--bs-border-color);
+  background-color: var(--bs-card-bg) !important;
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table th {
+  background-color: var(--bs-card-bg) !important;
+  color: var(--bs-body-color) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > td,
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > th {
+  --bs-table-accent-bg: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .navbar {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-theme="dark"] .layout-menu {
+  background-color: var(--bs-card-bg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+[data-theme="dark"] .menu-item a {
+  color: var(--bs-body-color) !important;
+}
+
+[data-theme="dark"] .menu-item a:hover {
+  background-color: var(--bs-secondary-bg) !important;
+}
+
+[data-theme="dark"] .menu-item.active > a {
+  background-color: #007bff !important;
+  color: white !important;
+}
+
+/* Компактный режим */
+body.compact-mode .table td,
+body.compact-mode .table th {
+  padding: 0.25rem 0.5rem !important;
+}
+
+body.compact-mode .card-body {
+  padding: 1rem !important;
+}
+
+body.compact-mode .btn {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+}
+
+body.compact-mode .form-floating {
+  margin-bottom: 0.5rem !important;
+}
+
+/* Цветные строки заказов - только если включены цветные строки */
+body.colored-order-rows .table tbody tr.status-new {
+  background-color: #C8FACC !important;
+}
+
+body.colored-order-rows .table tbody tr.status-new-paid {
+  background-color: #A6F3B5 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-reserve {
+  background-color: #FFF5B1 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-transfer {
+  background-color: #FFE79E !important;
+}
+
+body.colored-order-rows .table tbody tr.status-delivery {
+  background-color: #FFD47E !important;
+}
+
+body.colored-order-rows .table tbody tr.status-callback {
+  background-color: #FFBD6A !important;
+}
+
+body.colored-order-rows .table tbody tr.status-completed {
+  background-color: #B8E6FF !important;
+}
+
+body.colored-order-rows .table tbody tr.status-refund {
+  background-color: #9CD2FF !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled {
+  background-color: #FFBDBD !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-no-call {
+  background-color: #FFCCCC !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-year {
+  background-color: #FFB3B3 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-wrong {
+  background-color: #FF9999 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-found-other {
+  background-color: #FF8080 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-delivery {
+  background-color: #FF6666 !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-no-quantity {
+  background-color: #FF4D4D !important;
+}
+
+body.colored-order-rows .table tbody tr.status-cancelled-no-set {
+  background-color: #FF3333 !important;
+}
+
+/* Если цветные строки отключены - все строки белые в светлой теме */
+body:not(.colored-order-rows) .table tbody tr {
+  background-color: #ffffff !important;
+}
+
+/* В темной теме строки должны быть темными */
+[data-theme="dark"] body:not(.colored-order-rows) .table tbody tr {
+  background-color: var(--bs-card-bg) !important;
+}
+
+/* Темная тема для цветных строк */
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-new {
+  background-color: rgba(26, 35, 126, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-new-paid {
+  background-color: rgba(27, 94, 32, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-reserve {
+  background-color: rgba(230, 81, 0, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-transfer {
+  background-color: rgba(74, 20, 140, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-delivery {
+  background-color: rgba(27, 94, 32, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-callback {
+  background-color: rgba(183, 28, 28, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-completed {
+  background-color: rgba(136, 14, 79, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-refund {
+  background-color: rgba(245, 127, 23, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled {
+  background-color: rgba(0, 105, 92, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-call {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-year {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-wrong {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-found-other {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-delivery {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-quantity {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+[data-theme="dark"] body.colored-order-rows .table tbody tr.status-cancelled-no-set {
+  background-color: rgba(51, 105, 30, 0.3) !important;
+}
+
+/* Custom menu styles */
+.menu-sub {
+  display: none !important;
+  padding-left: 1rem;
+  list-style: none;
+}
+
+.menu-item.open .menu-sub {
+  display: block !important;
+}
+
+.menu-toggle {
+  position: relative;
+  cursor: pointer;
+}
+
+.menu-toggle::after {
+  content: '\ea6e';
+  font-family: 'remixicon';
+  float: right;
+  transition: transform 0.3s ease;
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.menu-item.open .menu-toggle::after {
+  transform: rotate(90deg);
+}
+
+/* Убеждаемся, что меню видимо при открытии */
+.menu-item.open > .menu-sub {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Hover эффект для свернутого меню */
+.layout-menu-collapsed.layout-menu-hover .layout-menu,
+.layout-menu-collapsed.layout-menu-hover .menu-collapsed,
+.layout-menu.menu-hover {
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.15) !important;
+  z-index: 1050;
+}
+
+/* При hover на свернутом меню показываем меню полностью */
+@media (min-width: 1200px) {
+  /* Временное расширение меню при hover (как в materio) */
+  .layout-menu-collapsed.layout-menu-hover .layout-menu,
+  .layout-menu.menu-hover {
+    width: var(--bs-menu-width, 260px) !important;
+    transition: width 0.3s ease;
+  }
+  
+  .layout-menu-collapsed.layout-menu-hover .menu-inner > .menu-item,
+  .layout-menu-collapsed.layout-menu-hover .menu-inner > .menu-header,
+  .layout-menu-collapsed.layout-menu-hover .menu-inner > .menu-block,
+  .layout-menu.menu-hover .menu-inner > .menu-item,
+  .layout-menu.menu-hover .menu-inner > .menu-header,
+  .layout-menu.menu-hover .menu-inner > .menu-block {
+    width: 100% !important;
+  }
+  
+  /* При hover показываем текст пунктов меню */
+  .layout-menu-collapsed.layout-menu-hover .menu-inner > .menu-item > .menu-link > div:not(.menu-block):not(.badge),
+  .layout-menu-collapsed.layout-menu-hover .app-brand-text,
+  .layout-menu.menu-hover .menu-inner > .menu-item > .menu-link > div:not(.menu-block):not(.badge),
+  .layout-menu.menu-hover .app-brand-text {
+    opacity: 1 !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+    max-width: none !important;
+  }
+  
+  /* Показываем подменю при hover */
+  .layout-menu-collapsed.layout-menu-hover .menu-inner > .menu-item.open > .menu-sub,
+  .layout-menu.menu-hover .menu-inner > .menu-item.open > .menu-sub {
+    display: flex !important;
+  }
+  
+  /* Показываем стрелки toggle при hover */
+  .layout-menu-collapsed.layout-menu-hover .menu-inner > .menu-item > .menu-toggle::after,
+  .layout-menu.menu-hover .menu-inner > .menu-item > .menu-toggle::after {
+    display: block !important;
+  }
+  
+  /* Скрываем submenu когда не hover */
+  .layout-menu-collapsed:not(.layout-menu-hover) .menu-inner > .menu-item > .menu-sub,
+  .layout-menu-collapsed:not(.layout-menu-hover) .menu-inner > .menu-item.open > .menu-sub {
+    display: none !important;
+  }
+}
+
+/* Предотвращаем автоматическое закрытие dropdown */
+.dropdown-menu {
+  pointer-events: auto;
+}
+
+.dropdown-toggle:focus {
+  box-shadow: none;
+}
+
+/* Убираем автоматическое закрытие при клике вне области */
+.navbar .dropdown-menu {
+  position: absolute;
+  will-change: transform;
+}
+

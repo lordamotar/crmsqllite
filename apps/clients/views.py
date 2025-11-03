@@ -24,7 +24,7 @@ from apps.accounts.models import User
 # Настройка логгера
 logger = logging.getLogger('client')
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def clients_list(request):
     """Список всех клиентов"""
     # Получаем параметры сортировки
@@ -53,6 +53,15 @@ def clients_list(request):
     clients_qs = (Client.objects.select_related()
                   .prefetch_related('phones', 'addresses')
                   .distinct().order_by(sort_field))
+    
+    # Поиск по имени и телефону
+    search_query = (request.GET.get('search') or '').strip()
+    if search_query:
+        from django.db.models import Q
+        clients_qs = clients_qs.filter(
+            Q(name__icontains=search_query) |
+            Q(phones__phone__icontains=search_query)
+        ).distinct()
 
     # Пагинация
     try:
@@ -78,11 +87,11 @@ def clients_list(request):
             'clients': clients,
             'current_sort': sort_by,
             'current_order': order,
-            'current_per_page': per_page,
+            'per_page': per_page,
         },
     )
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def add_client(request):
     """Добавление нового клиента"""
     # Обработка AJAX запросов
@@ -360,7 +369,7 @@ def add_client(request):
         },
     )
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def edit_client(request, client_id):
     """Редактирование клиента"""
     client = get_object_or_404(Client, id=client_id)
@@ -529,7 +538,7 @@ def edit_client(request, client_id):
     }
     return render(request, 'clients/edit_client.html', context)
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def delete_client(request, client_id):
     """Удаление клиента"""
     client = get_object_or_404(Client, id=client_id)
@@ -558,7 +567,7 @@ def delete_client(request, client_id):
         )
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def import_clients_excel(request):
     """Импорт клиентов из Excel файла"""
     if request.method != 'POST':

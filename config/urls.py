@@ -6,14 +6,15 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/accounts/', include('apps.accounts.urls')),
-    path('accounts/', include('apps.accounts.urls')),
+    path('api/accounts/', include(('apps.accounts.urls', 'accounts'), namespace='api_accounts')),
+    path('accounts/', include(('apps.accounts.urls', 'accounts'), namespace='accounts')),
     path('dashboard/', include('apps.dashboard.urls')),
     path('clients/', include('apps.clients.urls')),
     path('orders/', include('apps.orders.urls')),
     path('products/', include('apps.products.urls')),
     path('cities/', include('apps.cities.urls')),
     path('profile/', include('apps.user_profile.urls')),
+    path('plans/', include('apps.plans.urls')),
     path(
         '',
         RedirectView.as_view(

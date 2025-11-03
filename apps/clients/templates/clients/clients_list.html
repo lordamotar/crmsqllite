@@ -3,50 +3,87 @@
 
 {% block title %}Клиенты{% endblock %}
 
+{% block extra_css %}
+<style>
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    display: none;
+  }
+  input[type="search"]::-ms-clear {
+    display: none;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Список клиентов</h4>
+  <a href="{% url 'clients:add_client' %}" class="btn btn-primary">
+    <i class="icon-base ri ri-add-line me-1"></i>
+    Добавить клиента
+  </a>
+  </div>
   <div class="card">
-    <div class="card-datatable">
-      <div id="DataTables_Table_0_wrapper" class="dt-container dt-bootstrap5 dt-empty-footer">
-        <div class="row mx-2">
-          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
-            <div class="dt-length mb-0 mb-md-5">
-              <label for="dt-length-0">Show</label>
-              <select class="form-select form-select-sm" id="dt-length-0">
-                <option value="10" {% if current_per_page == 10 %}selected{% endif %}>10</option>
-                <option value="25" {% if current_per_page == 25 %}selected{% endif %}>25</option>
-                <option value="50" {% if current_per_page == 50 %}selected{% endif %}>50</option>
-                <option value="100" {% if current_per_page == 100 %}selected{% endif %}>100</option>
-              </select>
-            </div>
+    <div class="card-body">
+      <!-- Пагинация сверху -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+          <span class="me-3">Показать:</span>
+          <select name="per_page" class="form-select form-select-sm" style="width: auto;" onchange="changePerPage(this.value)">
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+          </select>
+          <span class="ms-3 text-muted">
+            {% if clients.paginator %}
+              Показано {{ clients.start_index }}-{{ clients.end_index }} из {{ clients.paginator.count }} записей
+            {% else %}
+              Показано 1-{{ clients|length }} из {{ clients|length }} записей
+            {% endif %}
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="me-3">
+            <form method="get" class="d-inline">
+              <div class="input-group">
+                <input type="search" class="form-control form-control-sm" name="search" placeholder="Поиск: телефон или ФИО/компания" value="{{ request.GET.search }}" style="width: 300px;" autocomplete="off">
+                <button class="btn btn-outline-primary btn-sm" type="submit">
+                  <i class="ri-search-line"></i>
+                </button>
+                {% if request.GET.search %}
+                  <a href="{% url 'clients:clients_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="ri-close-line"></i>
+                  </a>
+                {% endif %}
+              </div>
+              <!-- Сохраняем другие параметры -->
+              {% if request.GET.per_page %}
+                <input type="hidden" name="per_page" value="{{ request.GET.per_page }}">
+              {% endif %}
+              {% if request.GET.sort %}
+                <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+              {% endif %}
+              {% if request.GET.order %}
+                <input type="hidden" name="order" value="{{ request.GET.order }}">
+              {% endif %}
+            </form>
           </div>
-          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
-            <div class="dt-search me-4">
-              <input type="search" class="form-control form-control-sm" id="dt-search-0" placeholder="Поиск: телефон или ФИО/компания">
-              <label for="dt-search-0"></label>
-            </div>
-            <div class="dt-buttons btn-group flex-wrap mb-0 w-auto">
-              <a href="{% url 'clients:add_client' %}" class="btn add-new btn-primary">
-                <span>
-                  <i class="icon-base ri ri-add-line icon-sm me-0 me-sm-1"></i>
-                  <span class="d-none d-sm-inline-block">Добавить клиента</span>
-                </span>
-              </a>
-              <button type="button" class="btn btn-outline-primary" id="import-excel-btn">
-                <span>
-                  <i class="icon-base ri ri-file-excel-line icon-sm me-0 me-sm-1"></i>
-                  <span class="d-none d-sm-inline-block">Загрузить из Excel</span>
-                </span>
-              </button>
-            </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" id="import-excel-btn">
+              <i class="icon-base ri ri-file-excel-line me-1"></i>
+              Загрузить из Excel
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="justify-content-between dt-layout-table">
-          <div class="d-md-flex justify-content-between align-items-center dt-layout-full table-responsive">
-            <table class="datatables-permissions table dataTable dtr-column" id="DataTables_Table_0" style="width: 100%;">
-              <thead>
+      <!-- Таблица клиентов -->
+      <div class="table-responsive">
+            <table class="table table-hover table-sm">
+              <thead class="table-dark sticky-top">
                 <tr>
-                  <th class="dtr-hidden" style="display:none;"></th>
                   <th>Действия</th>
                   <th>
                     <a href="?sort=name&order={% if current_sort == 'name' and current_order == 'asc' %}desc{% else %}asc{% endif %}" 
@@ -118,7 +155,6 @@
               <tbody id="clients-tbody">
                 {% for client in clients %}
                 <tr data-name="{{ client.name|lower }}" data-phone="{% if client.phones.first %}{{ client.phones.first.phone }}{% else %}{% endif %}">
-                  <td class="dtr-hidden" style="display:none;"></td>
                   <td>
                     <div class="d-flex align-items-center">
                       <span class="text-nowrap">
@@ -149,46 +185,45 @@
                 {% endfor %}
               </tbody>
             </table>
-          </div>
-        </div>
-
-        <div class="row mx-3 justify-content-between">
-          <div class="d-md-flex justify-content-between align-items-center dt-layout-start col-md-auto me-auto mt-0 px-5">
-            <div class="dt-info" aria-live="polite" id="DataTables_Table_0_info" role="status">
-              {% if clients.paginator %}
-                Showing {{ clients.start_index }} to {{ clients.end_index }} of {{ clients.paginator.count }} entries
-              {% else %}
-                Showing 1 to {{ clients|length }} of {{ clients|length }} entries
-              {% endif %}
-            </div>
-          </div>
-          <div class="align-items-center dt-layout-end col-md-auto ms-auto justify-content-md-between justify-content-center d-flex">
-            <div class="dt-paging">
-              {% if clients.has_other_pages %}
-              <nav aria-label="pagination">
-                <ul class="pagination">
-                  <li class="dt-paging-button page-item {% if not clients.has_previous %}disabled{% endif %}">
-                    <a class="page-link first" href="{% if clients.has_previous %}?page=1&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="First"><i class="icon-base ri ri-skip-back-mini-line scaleX-n1-rtl icon-22px"></i></a>
-                  </li>
-                  <li class="dt-paging-button page-item {% if not clients.has_previous %}disabled{% endif %}">
-                    <a class="page-link previous" href="{% if clients.has_previous %}?page={{ clients.number|add:'-1' }}&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="Previous"><i class="icon-base ri ri-arrow-left-s-line scaleX-n1-rtl icon-22px"></i></a>
-                  </li>
-                  <li class="dt-paging-button page-item active"><span class="page-link">{{ clients.number }}</span></li>
-                  <li class="dt-paging-button page-item {% if not clients.has_next %}disabled{% endif %}">
-                    <a class="page-link next" href="{% if clients.has_next %}?page={{ clients.number|add:'1' }}&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="Next"><i class="icon-base ri ri-arrow-right-s-line scaleX-n1-rtl icon-22px"></i></a>
-                  </li>
-                  <li class="dt-paging-button page-item {% if not clients.has_next %}disabled{% endif %}">
-                    <a class="page-link last" href="{% if clients.has_next %}?page={{ clients.paginator.num_pages }}&per_page={{ current_per_page }}&sort={{ current_sort }}&order={{ current_order }}{% else %}#{% endif %}" aria-label="Last"><i class="icon-base ri ri-skip-forward-mini-line scaleX-n1-rtl icon-22px"></i></a>
-                  </li>
-                </ul>
-              </nav>
-              {% endif %}
-            </div>
-          </div>
-        </div>
       </div>
+
+      <!-- Пагинация внизу -->
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if clients.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">Первая</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ clients.previous_page_number }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">Предыдущая</a>
+            </li>
+          {% endif %}
+
+          {% for num in clients.paginator.page_range %}
+            {% if num == clients.number %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > clients.number|add:'-3' and num < clients.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if clients.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ clients.next_page_number }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">Следующая</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ clients.paginator.num_pages }}{% if per_page %}&per_page={{ per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">Последняя</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
     </div>
   </div>
+</div>
 
   <!-- Import Excel Modal -->
   <div class="modal fade" id="importExcelModal" tabindex="-1" aria-hidden="true">
@@ -277,16 +312,17 @@
     </div>
   </div>
 
+<script>
+function changePerPage(value) {
+  const url = new URL(window.location);
+  url.searchParams.set('per_page', value);
+  url.searchParams.set('page', '1');
+  window.location.href = url.toString();
+}
+</script>
+
   <script>
   (function() {
-    // Переключение количества на странице — меняем URL (сохраняем сортировку и поиск)
-    const perSelect = document.getElementById('dt-length-0');
-    perSelect?.addEventListener('change', function(){
-      const params = new URLSearchParams(window.location.search);
-      params.set('per_page', this.value);
-      params.set('page', '1');
-      window.location.search = params.toString();
-    });
 
     function getCookie(name) {
       const value = `; ${document.cookie}`;
@@ -342,22 +378,7 @@
           }
         });
     });
-    // Мгновенный поиск по имени/компании и телефону (маска игнорируется)
-    const searchInput = document.getElementById('dt-search-0');
-    const tbody = document.getElementById('clients-tbody');
-    function normPhone(s){ return (s||'').replace(/[^0-9]/g,''); }
-    searchInput?.addEventListener('input', function(){
-      const q = (this.value || '').trim().toLowerCase();
-      const qDigits = normPhone(q);
-      const rows = tbody?.querySelectorAll('tr') || [];
-      rows.forEach(tr => {
-        const nameData = (tr.getAttribute('data-name') || '').toLowerCase();
-        const phoneData = normPhone(tr.getAttribute('data-phone') || '');
-        const matchName = q ? nameData.includes(q) : false;
-        const matchPhone = qDigits ? phoneData.includes(qDigits) : false;
-        tr.style.display = (!q) || matchName || matchPhone ? '' : 'none';
-      });
-    });
+    // Поиск теперь через форму, обработка не требуется
 
     // Обработка импорта Excel
     const importBtn = document.getElementById('import-excel-btn');

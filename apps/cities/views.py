@@ -6,7 +6,7 @@ from django.db.models import Q
 from .models import City
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def cities_list(request):
     """Список городов"""
     search_query = request.GET.get('search', '')
@@ -96,7 +96,7 @@ def cities_list(request):
     })
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def add_city(request):
     """Добавление города"""
     if request.method == 'POST':
@@ -139,7 +139,7 @@ def add_city(request):
     return render(request, 'cities/add_city.html')
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def edit_city(request, city_id):
     """Редактирование города"""
     city = get_object_or_404(City, id=city_id)
@@ -185,7 +185,7 @@ def edit_city(request, city_id):
     return render(request, 'cities/edit_city.html', {'city': city})
 
 
-@login_required(login_url='login')
+@login_required(login_url='accounts:login')
 def delete_city(request, city_id):
     """Удаление города"""
     if request.method == 'POST':

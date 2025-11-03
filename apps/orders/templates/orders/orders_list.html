@@ -6,14 +6,26 @@
 
 {% block extra_css %}
 <!-- Стили вынесены в static/frontend/assets/css/demo.css -->
+<style>
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    display: none;
+  }
+  input[type="search"]::-ms-clear {
+    display: none;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
-  <div class="d-flex justify-content-between align-items-center mb-6">
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">Список заказов</h4>
+    <a href="{% url 'orders:add_order' %}" class="btn btn-primary">
+      <i class="icon-base ri ri-add-line me-1"></i>
+      Создать заказ
+    </a>
   </div>
-
   <div class="card">
     <div class="card-body">
       <!-- Пагинация сверху -->
@@ -31,18 +43,17 @@
           </span>
         </div>
         <div class="d-flex align-items-center">
-          <div class="me-3">
             <form method="get" class="d-inline">
               <div class="input-group">
-                <input type="search" class="form-control form-control-sm" name="search" placeholder="Поиск по всем полям заказа" value="{{ request.GET.search }}" style="width: 300px;">
+                <input type="search" class="form-control form-control-sm" name="search" placeholder="Поиск по всем полям заказа" value="{{ request.GET.search }}" style="width: 300px;" autocomplete="off">
                 <button class="btn btn-outline-primary btn-sm" type="submit">
                   <i class="ri-search-line"></i>
                 </button>
-                {% if request.GET.search %}
-                  <a href="{% url 'orders:orders_list' %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="ri-close-line"></i>
-                  </a>
-                {% endif %}
+              {% if request.GET.search %}
+                <a href="{% url 'orders:orders_list' %}" class="btn btn-outline-secondary btn-sm">
+                  <i class="ri-close-line"></i>
+                </a>
+              {% endif %}
               </div>
               <!-- Сохраняем другие параметры -->
               {% if request.GET.per_page %}
@@ -55,11 +66,6 @@
                 <input type="hidden" name="order" value="{{ request.GET.order }}">
               {% endif %}
             </form>
-          </div>
-    <a href="{% url 'orders:add_order' %}" class="btn btn-primary">
-      <i class="icon-base ri ri-add-line me-1"></i>
-      Создать заказ
-    </a>
         </div>
   </div>
 
@@ -214,9 +220,39 @@
                     </td>
                   <!--  <td rowspan="{{ order.items.count }}">{{ order.order_number }}</td>-->
                     <td rowspan="{{ order.items.count }}">
-                      <h6 class="mb-0 align-items-center d-flex w-px-100 {{ order.status|status_text_class }}">
-                        <i class="icon-base ri ri-circle-fill icon-10px me-1"></i>{{ order.get_status_display }}
-                      </h6>
+                      <div class="dropdown order-status-dropdown" data-order-id="{{ order.id }}">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between {{ order.status|status_text_class }}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <span class="d-flex align-items-center">
+                            <i class="icon-base ri ri-circle-fill icon-10px me-1"></i>
+                            <span class="order-status-text">{{ order.get_status_display }}</span>
+                          </span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li class="dropdown-header">Новые</li>
+                          <li><a class="dropdown-item{% if order.status == 'new' %} active{% endif %}" href="#" data-status-value="new">Новый</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'new_paid' %} active{% endif %}" href="#" data-status-value="new_paid">Новый оплаченный</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li class="dropdown-header">Промежуточные</li>
+                          <li><a class="dropdown-item{% if order.status == 'reserve' %} active{% endif %}" href="#" data-status-value="reserve">Резерв</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'transfer' %} active{% endif %}" href="#" data-status-value="transfer">Перемещение</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'delivery' %} active{% endif %}" href="#" data-status-value="delivery">Доставка</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'callback' %} active{% endif %}" href="#" data-status-value="callback">Перезвонить</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li class="dropdown-header">Завершённые</li>
+                          <li><a class="dropdown-item{% if order.status == 'completed' %} active{% endif %}" href="#" data-status-value="completed">Выполнен</a></li>
+                          <li><a class="dropdown-item text-danger" href="#" data-status-value="cancelled">Отмена…</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li class="dropdown-header">Отмена — причины</li>
+                          <li><a class="dropdown-item{% if order.status == 'refund' %} active{% endif %}" href="#" data-status-value="refund">Возврат товара/средств</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_no_answer' %} active{% endif %}" href="#" data-status-value="cancel_no_answer">Не дозвонился</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_not_suitable_year' %} active{% endif %}" href="#" data-status-value="cancel_not_suitable_year">Не устроил год</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_wrong_order' %} active{% endif %}" href="#" data-status-value="cancel_wrong_order">Ошибочный заказ</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_found_other' %} active{% endif %}" href="#" data-status-value="cancel_found_other">Нашел другие шины</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_delivery_terms' %} active{% endif %}" href="#" data-status-value="cancel_delivery_terms">Условия доставки</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_no_quantity' %} active{% endif %}" href="#" data-status-value="cancel_no_quantity">Нет нужного количества</a></li>
+                          <li><a class="dropdown-item{% if order.status == 'cancel_incomplete' %} active{% endif %}" href="#" data-status-value="cancel_incomplete">Не комплект (не собран)</a></li>
+                        </ul>
+                      </div>
                     </td>
                     <td rowspan="{{ order.items.count }}">{{ order.created_at|date:"d.m.Y" }}</td>
                     <td rowspan="{{ order.items.count }}">
@@ -526,9 +562,122 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Inline смена статуса заказа
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  document.body.addEventListener('click', function(e) {
+    const item = e.target.closest('.order-status-dropdown .dropdown-item');
+    if (!item) return;
+    e.preventDefault();
+
+    const dropdown = item.closest('.order-status-dropdown');
+    const orderId = dropdown.getAttribute('data-order-id');
+    const newStatus = item.getAttribute('data-status-value');
+    if (!orderId || !newStatus) return;
+
+    // Если выбрана "Отмена…" — открываем модал выбора причины и выходим
+    if (newStatus === 'cancelled') {
+      const cancelModalEl = document.getElementById('cancelReasonModal');
+      const reasonSelect = document.getElementById('cancelReasonSelectList');
+      const confirmBtn = document.getElementById('confirmCancelReasonBtn');
+      if (reasonSelect) reasonSelect.value = '';
+      const modal = new bootstrap.Modal(cancelModalEl);
+      modal.show();
+
+      // Навешиваем одноразовый обработчик подтверждения
+      const onConfirm = () => {
+        const reason = reasonSelect ? reasonSelect.value : '';
+        if (!reason) {
+          if (window.showNotification) window.showNotification('Выберите причину отмены', 'error');
+          return;
+        }
+        // Подменяем статус на конкретную причину и отправляем
+        postStatus(orderId, reason, dropdown, item);
+        modal.hide();
+        confirmBtn.removeEventListener('click', onConfirm);
+      };
+      confirmBtn.addEventListener('click', onConfirm);
+      return;
+    }
+
+    // Иначе — отправляем выбранный статус
+    postStatus(orderId, newStatus, dropdown, item);
+  });
+
+  function postStatus(orderId, statusValue, dropdown, item){
+    fetch('{% url "orders:update_order_status" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ order_id: orderId, status: statusValue })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status !== 'success') {
+        if (window.showNotification) window.showNotification(data.message || 'Ошибка обновления статуса', 'error');
+        return;
+      }
+      const btn = dropdown.querySelector('button');
+      const textEl = dropdown.querySelector('.order-status-text');
+      textEl.textContent = data.status_display || statusValue;
+      btn.classList.remove('text-success', 'text-warning', 'text-danger', 'text-primary', 'text-muted');
+      if (data.text_class) btn.classList.add(data.text_class);
+      const tr = dropdown.closest('tr');
+      if (tr) {
+        tr.className = tr.className.replace(/status-[^\s]+/, '');
+        if (data.css_class) tr.classList.add(`status-${data.css_class}`);
+      }
+      dropdown.querySelectorAll('.dropdown-item').forEach(a => a.classList.remove('active'));
+      if (item) item.classList.add('active');
+      if (window.showNotification) window.showNotification('Статус обновлён', 'success');
+    })
+    .catch(() => {
+      if (window.showNotification) window.showNotification('Сетевая ошибка', 'error');
+    });
+  }
 });
 </script>
 
 <!-- JavaScript вынесен в static/frontend/assets/js/orders-list.js -->
 <script src="{% static 'frontend/assets/js/orders-list.js' %}"></script>
+<!-- Модал выбора причины отмены -->
+<div class="modal fade" id="cancelReasonModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Указать причину отмены</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Причина отмены</label>
+          <select id="cancelReasonSelectList" class="form-control">
+            <option value="">— Выберите причину —</option>
+            <option value="refund">Возврат товара/средств</option>
+            <option value="cancel_no_answer">Не дозвонился</option>
+            <option value="cancel_not_suitable_year">Не устроил год</option>
+            <option value="cancel_wrong_order">Ошибочный заказ</option>
+            <option value="cancel_found_other">Нашел другие шины</option>
+            <option value="cancel_delivery_terms">Условия доставки</option>
+            <option value="cancel_no_quantity">Нет нужного количества</option>
+            <option value="cancel_incomplete">Не комплект (не собран)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-danger" id="confirmCancelReasonBtn">
+          <i class="ri-close-circle-line me-1"></i>Подтвердить отмену
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

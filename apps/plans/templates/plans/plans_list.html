@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Планы - CRM{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Список планов</h4>
+    <a href="{% url 'plans:add_plan' %}" class="btn btn-primary">
+      <i class="icon-base ri ri-add-line me-1"></i>
+      Создать план
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <!-- Пагинация сверху -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+          <span class="me-3">Показать:</span>
+          <select name="per_page" class="form-select form-select-sm" style="width: auto;" onchange="changePerPage(this.value)">
+            <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+            <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+            <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+            <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+          </select>
+          <span class="ms-3 text-muted">
+            Показано {{ plans.start_index }}-{{ plans.end_index }} из {{ plans.paginator.count }} записей
+          </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <form method="get" class="d-inline">
+            <div class="input-group">
+              <input type="search" class="form-control form-control-sm" name="search" placeholder="Поиск по названию плана" value="{{ request.GET.search }}" style="width: 300px;" autocomplete="off">
+              <button class="btn btn-outline-primary btn-sm" type="submit">
+                <i class="ri-search-line"></i>
+              </button>
+              {% if request.GET.search %}
+                <a href="{% url 'plans:plans_list' %}" class="btn btn-outline-secondary btn-sm">
+                  <i class="ri-close-line"></i>
+                </a>
+              {% endif %}
+            </div>
+            <!-- Сохраняем другие параметры -->
+            {% if request.GET.per_page %}
+              <input type="hidden" name="per_page" value="{{ request.GET.per_page }}">
+            {% endif %}
+            {% if request.GET.sort %}
+              <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+            {% endif %}
+            {% if request.GET.order %}
+              <input type="hidden" name="order" value="{{ request.GET.order }}">
+            {% endif %}
+          </form>
+        </div>
+      </div>
+
+      <!-- Таблица планов -->
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th style="min-width: 100px;" class="text-center">Действия</th>
+              <th style="min-width: 200px;" data-sort="name">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="asc" onclick="handleSortClick(this)"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="desc" onclick="handleSortClick(this)"></i>
+                  Название плана
+                </div>
+              </th>
+              <th style="min-width: 120px;" data-sort="start_date">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="asc" onclick="handleSortClick(this)"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="desc" onclick="handleSortClick(this)"></i>
+                  Дата начала
+                </div>
+              </th>
+              <th style="min-width: 120px;" data-sort="end_date">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="asc" onclick="handleSortClick(this)"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="desc" onclick="handleSortClick(this)"></i>
+                  Дата окончания
+                </div>
+              </th>
+              <th style="min-width: 150px;" data-sort="created_by">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="asc" onclick="handleSortClick(this)"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="desc" onclick="handleSortClick(this)"></i>
+                  Создал
+                </div>
+              </th>
+              <th style="min-width: 100px;">Назначений</th>
+              <th style="min-width: 200px;">Менеджеры</th>
+              <th style="min-width: 120px;" data-sort="created_at">
+                <div class="d-flex align-items-center">
+                  <i class="ri-arrow-up-line me-1 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="asc" onclick="handleSortClick(this)"></i>
+                  <i class="ri-arrow-down-line me-2 text-muted sort-arrow" style="font-size: 12px; cursor: pointer;" data-direction="desc" onclick="handleSortClick(this)"></i>
+                  Дата создания
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for plan in plans %}
+              <tr>
+                <td class="text-center">
+                  {% if user.is_superuser or plan.created_by == user %}
+                    <a href="{% url 'plans:edit_plan' plan.id %}" class="btn btn-sm btn-label-primary" title="Редактировать">
+                      <i class="ri-edit-line"></i>
+                    </a>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <strong>
+                    <a href="{% url 'plans:edit_plan' plan.id %}" class="text-decoration-none">
+                      {{ plan.name }}
+                    </a>
+                  </strong>
+                  {% if plan.description %}
+                    <br><small class="text-muted">{{ plan.description|truncatewords:15 }}</small>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-label-secondary">{{ plan.start_date|date:"d.m.Y" }}</span>
+                </td>
+                <td>
+                  <span class="badge bg-label-secondary">{{ plan.end_date|date:"d.m.Y" }}</span>
+                </td>
+                <td>
+                  {% if plan.created_by %}
+                    <span class="badge bg-label-info">{{ plan.created_by.short_name }}</span>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-label-primary">{{ plan.assignments_count }}</span>
+                </td>
+                <td>
+                  <div class="d-flex flex-wrap gap-1">
+                    {% for assignment in plan.managers_list %}
+                      <span class="badge bg-label-success">{{ assignment.manager.short_name }}</span>
+                    {% endfor %}
+                    {% if plan.extra_managers_count > 0 %}
+                      <span class="badge bg-label-secondary">+{{ plan.extra_managers_count }}</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <small class="text-muted">{{ plan.created_at|date:"d.m.Y H:i" }}</small>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="8" class="text-center text-muted py-5">
+                  <i class="ri-file-list-3-line" style="font-size: 48px; opacity: 0.3;"></i>
+                  <p class="mt-3 mb-0">Планы не найдены</p>
+                  <a href="{% url 'plans:add_plan' %}" class="btn btn-primary btn-sm mt-3">
+                    <i class="ri-add-line me-1"></i>
+                    Создать первый план
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Пагинация снизу -->
+      {% if plans.has_other_pages %}
+        <nav aria-label="Пагинация">
+          <ul class="pagination justify-content-center">
+            {% if plans.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ plans.previous_page_number }}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">Предыдущая</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Предыдущая</span>
+              </li>
+            {% endif %}
+            
+            {% for num in plans.paginator.page_range %}
+              {% if plans.number == num %}
+                <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% elif num > plans.number|add:'-3' and num < plans.number|add:'3' %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+            
+            {% if plans.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ plans.next_page_number }}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.order %}&order={{ request.GET.order }}{% endif %}">Следующая</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Следующая</span>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+function changePerPage(value) {
+  const url = new URL(window.location);
+  url.searchParams.set('per_page', value);
+  url.searchParams.set('page', '1');
+  window.location.href = url.toString();
+}
+
+function handleSortClick(element) {
+  const sortField = element.closest('th').getAttribute('data-sort');
+  const direction = element.getAttribute('data-direction');
+  
+  const url = new URL(window.location);
+  url.searchParams.set('sort', sortField);
+  url.searchParams.set('order', direction);
+  url.searchParams.set('page', '1');
+  window.location.href = url.toString();
+}
+</script>
+{% endblock %}
+

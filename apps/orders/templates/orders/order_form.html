@@ -238,20 +238,24 @@
             
               <optgroup label="ЗАВЕРШЕННЫЕ">
                 <option value="completed">Выполнен</option>
-                <option value="refund">Возврат средств</option>
-                <option value="cancelled">Отменён (указать причину)</option>
-              </optgroup>
-            
-              <optgroup label="ОТМЕНА — ПРИЧИНЫ">
-                <option value="cancel_no_answer">Отменен — не дозвонился</option>
-                <option value="cancel_not_suitable_year">Отменен — не устроил год</option>
-                <option value="cancel_wrong_order">Отменен — ошибочный заказ</option>
-                <option value="cancel_found_other">Отменен — нашел другие</option>
-                <option value="cancel_delivery_terms">Отменен — условия доставки</option>
-                <option value="cancel_no_quantity">Отменен — нет нужного кол-ва</option>
-                <option value="cancel_incomplete">Отменен — не комплект</option>
+                <option value="cancelled">Отмена</option>
               </optgroup>
             </select>
+            <!-- Блок выбора причины отмены (показывается при выборе "Отмена") -->
+            <div id="cancelReasonWrapper" class="mt-2 d-none">
+              <label class="form-label">Причина отмены</label>
+              <select id="cancelReasonSelect" class="form-control">
+                <option value="">— Выберите причину —</option>
+                <option value="refund">Возврат товара/средств</option>
+                <option value="cancel_no_answer">Не дозвонился</option>
+                <option value="cancel_not_suitable_year">Не устроил год</option>
+                <option value="cancel_wrong_order">Ошибочный заказ</option>
+                <option value="cancel_found_other">Нашел другие шины</option>
+                <option value="cancel_delivery_terms">Условия доставки</option>
+                <option value="cancel_no_quantity">Нет нужного количества</option>
+                <option value="cancel_incomplete">Не комплект (не собран)</option>
+              </select>
+            </div>
             
           </div>
           <div class="col-md-4">
@@ -666,6 +670,8 @@
   const clientCityInput = document.getElementById('clientCityInput');
   const clientAddressComment = document.getElementById('clientAddressComment');
   const statusSelect = document.getElementById('statusSelect');
+  const cancelReasonWrapper = document.getElementById('cancelReasonWrapper');
+  const cancelReasonSelect = document.getElementById('cancelReasonSelect');
   const sourceSelect = document.getElementById('sourceSelect');
   const paymentSelect = document.getElementById('paymentSelect');
   const deliverySelect = document.getElementById('deliverySelect');
@@ -720,6 +726,59 @@
       console.log('Товар не выбран, цена не обновлена');
     }
   });
+
+  // === Логика причин отмены ===
+  function isCancelReason(value){
+    return !!value && (value === 'refund' || value.startsWith('cancel_'));
+  }
+
+  function syncCancelUIFromStatus(){
+    const val = statusSelect ? statusSelect.value : '';
+    if (!statusSelect) return;
+    if (val === 'cancelled') {
+      // Показать выбор причины, пока не выбрано
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.remove('d-none');
+      if (cancelReasonSelect) cancelReasonSelect.value = '';
+    } else if (isCancelReason(val)) {
+      // Если статус уже конкретная причина — показать блок и выставить её
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.remove('d-none');
+      if (cancelReasonSelect) {
+        // map устаревшего значения cancelled_refund -> refund
+        const mapped = (val === 'cancelled_refund') ? 'refund' : val;
+        cancelReasonSelect.value = mapped;
+      }
+    } else {
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.add('d-none');
+      if (cancelReasonSelect) cancelReasonSelect.value = '';
+    }
+  }
+
+  statusSelect?.addEventListener('change', () => {
+    const val = statusSelect.value;
+    if (val === 'cancelled') {
+      // Показываем селект причин
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.remove('d-none');
+      if (cancelReasonSelect) cancelReasonSelect.value = '';
+    } else if (isCancelReason(val)) {
+      // Если напрямую выбрали причину в общем списке — просто синхронизация UI
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.remove('d-none');
+      if (cancelReasonSelect) cancelReasonSelect.value = (val === 'cancelled_refund') ? 'refund' : val;
+    } else {
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.add('d-none');
+      if (cancelReasonSelect) cancelReasonSelect.value = '';
+    }
+  });
+
+  cancelReasonSelect?.addEventListener('change', () => {
+    const reason = cancelReasonSelect.value;
+    // Визуально статус оставляем как "Отмена"; конкретное значение подставим при сабмите
+    if (statusSelect && statusSelect.value !== 'cancelled') {
+      statusSelect.value = 'cancelled';
+    }
+  });
+
+  // Инициализация UI при открытии формы
+  syncCancelUIFromStatus();
 
 
 
@@ -880,9 +939,15 @@
       return;
     }
 
+    let statusValue = statusSelect.value;
+    if (statusValue === 'cancelled' && cancelReasonSelect && cancelReasonSelect.value) {
+      // Подменяем статус на выбранную причину, не меняя визуальное значение селекта
+      statusValue = (cancelReasonSelect.value === 'refund') ? 'refund' : cancelReasonSelect.value;
+    }
+
     const payload = {
       client_id: clientSelect.value,
-      status: statusSelect.value,
+      status: statusValue,
       source: sourceSelect.value,
       payment_method: paymentSelect.value,
       delivery_method: deliverySelect.value,
@@ -1002,7 +1067,17 @@
     if (clientOption) clientOption.selected = true;
 
     // status & params
-    document.getElementById('statusSelect').value = '{{ order.status }}';
+    const initialStatus = '{{ order.status }}';
+    const statusEl = document.getElementById('statusSelect');
+    // Если статус — одна из причин отмены, визуально ставим "Отмена" и предзаполняем причину
+    if (['refund','cancel_no_answer','cancel_not_suitable_year','cancel_wrong_order','cancel_found_other','cancel_delivery_terms','cancel_no_quantity','cancel_incomplete'].includes(initialStatus)) {
+      if (statusEl) statusEl.value = 'cancelled';
+      // Показать и установить причину
+      if (cancelReasonWrapper) cancelReasonWrapper.classList.remove('d-none');
+      if (cancelReasonSelect) cancelReasonSelect.value = (initialStatus === 'refund') ? 'refund' : initialStatus;
+    } else {
+      if (statusEl) statusEl.value = initialStatus;
+    }
     document.getElementById('sourceSelect').value = '{{ order.source }}';
     document.getElementById('paymentSelect').value = '{{ order.payment_method }}';
     document.getElementById('deliverySelect').value = '{{ order.delivery_method }}';

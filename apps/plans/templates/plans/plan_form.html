@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Редактировать план{% else %}Создать план{% endif %} - CRM{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">{% if is_edit %}Редактирование плана{% else %}Создание плана{% endif %}</h4>
+    <a href="{% url 'plans:plans_list' %}" class="btn btn-label-secondary">
+      <i class="icon-base ri ri-arrow-left-line me-1"></i>
+      Назад к списку
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form id="planForm">
+        <!-- Основная информация -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              <i class="ri-file-text-line me-1"></i>
+              Название плана *
+            </label>
+            <input type="text" id="planName" class="form-control" placeholder="Например: План июнь 2025" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">
+              <i class="ri-calendar-line me-1"></i>
+              Дата начала *
+            </label>
+            <input type="date" id="startDate" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">
+              <i class="ri-calendar-check-line me-1"></i>
+              Дата окончания *
+            </label>
+            <input type="date" id="endDate" class="form-control" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">
+              <i class="ri-file-text-line me-1"></i>
+              Описание
+            </label>
+            <textarea id="description" class="form-control" rows="3" placeholder="Дополнительные комментарии к плану"></textarea>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Назначения менеджерам -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Назначения менеджерам</h5>
+            <button type="button" class="btn btn-primary btn-sm" onclick="addAssignment()">
+              <i class="ri-add-line me-1"></i>
+              Добавить назначение
+            </button>
+          </div>
+
+          <div id="assignmentsContainer">
+            <!-- Назначения будут добавлены через JavaScript -->
+          </div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="d-flex justify-content-end gap-2">
+          <a href="{% url 'plans:plans_list' %}" class="btn btn-label-secondary">Отмена</a>
+          <button type="submit" class="btn btn-primary">
+            <i class="ri-save-line me-1"></i>
+            {% if is_edit %}Сохранить изменения{% else %}Создать план{% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Шаблон для назначения -->
+<template id="assignmentTemplate">
+  <div class="assignment-item card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Назначение <span class="assignment-number"></span></h6>
+        <button type="button" class="btn btn-sm btn-label-danger" onclick="removeAssignment(this)">
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Менеджер *</label>
+          <select class="form-select manager-select" required>
+            <option value="">— Выберите менеджера —</option>
+            {% for subordinate in subordinates %}
+            <option value="{{ subordinate.id }}" data-name="{{ subordinate.short_name }}">{{ subordinate.short_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Целевое кол-во заказов</label>
+          <input type="number" class="form-control target-count" min="0" value="0">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Целевая сумма</label>
+          <input type="number" class="form-control target-sum" step="0.01" min="0" value="0">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Условие выполнения</label>
+          <select class="form-select criteria-operator">
+            <option value="both">Оба критерия (кол-во и сумма)</option>
+            <option value="either">Любой критерий (кол-во или сумма)</option>
+          </select>
+        </div>
+        {% if is_edit %}
+        <div class="col-12">
+          <div class="alert alert-info mb-0">
+            <small>
+              <strong>Прогресс:</strong> 
+              Заказов: <span class="achieved-count">0</span> / <span class="target-count-display">0</span> | 
+              Сумма: <span class="achieved-sum">0</span> / <span class="target-sum-display">0</span> |
+              <span class="achievement-status"></span>
+            </small>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+const subordinates = [
+  {% for subordinate in subordinates %}
+  { id: {{ subordinate.id }}, name: "{{ subordinate.short_name }}" },
+  {% endfor %}
+];
+
+let assignmentCounter = 0;
+const assignments = [];
+
+function addAssignment(data = null) {
+  assignmentCounter++;
+  const template = document.getElementById('assignmentTemplate');
+  const clone = template.content.cloneNode(true);
+  const assignmentItem = clone.querySelector('.assignment-item');
+  assignmentItem.dataset.index = assignmentCounter;
+  
+  if (data) {
+    clone.querySelector('.manager-select').value = data.manager_id || '';
+    clone.querySelector('.target-count').value = data.target_count || 0;
+    clone.querySelector('.target-sum').value = data.target_sum || 0;
+    clone.querySelector('.criteria-operator').value = data.criteria_operator || 'both';
+    
+    if (data.achieved_count !== undefined) {
+      clone.querySelector('.achieved-count').textContent = data.achieved_count || 0;
+      clone.querySelector('.target-count-display').textContent = data.target_count || 0;
+      clone.querySelector('.achieved-sum').textContent = (data.achieved_sum || 0).toLocaleString('ru-RU');
+      clone.querySelector('.target-sum-display').textContent = (data.target_sum || 0).toLocaleString('ru-RU');
+      const statusEl = clone.querySelector('.achievement-status');
+      if (data.is_achieved) {
+        statusEl.innerHTML = '<span class="badge bg-success">Выполнен</span>';
+      } else {
+        statusEl.innerHTML = '<span class="badge bg-warning">В процессе</span>';
+      }
+    }
+  }
+  
+  clone.querySelector('.assignment-number').textContent = assignmentCounter;
+  
+  document.getElementById('assignmentsContainer').appendChild(clone);
+}
+
+function removeAssignment(btn) {
+  btn.closest('.assignment-item').remove();
+}
+
+// Инициализация формы редактирования
+{% if is_edit and plan %}
+document.addEventListener('DOMContentLoaded', function() {
+  // Заполняем основные поля
+  document.getElementById('planName').value = '{{ plan.name|escapejs }}';
+  document.getElementById('startDate').value = '{{ plan.start_date|date:"Y-m-d" }}';
+  document.getElementById('endDate').value = '{{ plan.end_date|date:"Y-m-d" }}';
+  document.getElementById('description').value = `{{ plan.description|escapejs }}`;
+  
+  // Добавляем назначения
+  {% if assignments_data_json %}
+  const assignmentsData = {{ assignments_data_json|safe }};
+  assignmentsData.forEach(data => {
+    addAssignment(data);
+  });
+  {% endif %}
+});
+{% endif %}
+
+// Обработка отправки формы
+document.getElementById('planForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('planName').value.trim();
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  const description = document.getElementById('description').value.trim();
+  
+  if (!name || !startDate || !endDate) {
+    alert('Заполните обязательные поля');
+    return;
+  }
+  
+  // Собираем назначения
+  const assignmentsData = [];
+  const assignmentItems = document.querySelectorAll('.assignment-item');
+  assignmentItems.forEach((item, index) => {
+    const managerId = item.querySelector('.manager-select').value;
+    if (!managerId) return;
+    
+    assignmentsData.push({
+      manager_id: parseInt(managerId),
+      target_count: parseInt(item.querySelector('.target-count').value) || 0,
+      target_sum: parseFloat(item.querySelector('.target-sum').value) || 0,
+      criteria_operator: item.querySelector('.criteria-operator').value || 'both',
+    });
+  });
+  
+  const payload = {
+    name: name,
+    start_date: startDate,
+    end_date: endDate,
+    description: description,
+    assignments: assignmentsData,
+  };
+  
+  const isEdit = {% if is_edit %}true{% else %}false{% endif %};
+  {% if is_edit and plan %}
+  const editUrl = '{% url "plans:edit_plan" plan.id %}';
+  {% else %}
+  const editUrl = '';
+  {% endif %}
+  const url = isEdit ? editUrl : '{% url "plans:add_plan" %}';
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      alert(data.message);
+      window.location.href = data.redirect_url || '{% url "plans:plans_list" %}';
+    } else {
+      alert(data.message || 'Ошибка при сохранении плана');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Произошла ошибка при сохранении плана');
+  }
+});
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Добавляем первое назначение при загрузке страницы (только для создания)
+{% if not is_edit %}
+document.addEventListener('DOMContentLoaded', function() {
+  if (subordinates.length > 0) {
+    addAssignment();
+  }
+});
+{% endif %}
+</script>
+
+<style>
+.assignment-item {
+  border: 1px solid #e0e0e0;
+}
+</style>
+{% endblock %}
+

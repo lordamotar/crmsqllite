@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load order_extras %}
 
 {% block title %}Заказ {{ order.order_number }} - CRM{% endblock %}
 
@@ -71,16 +72,16 @@
                   <td>{{ item.product_name }}</td>
                   <td><span class="badge bg-label-info">{{ item.segment }}</span></td>
                   <td>{{ item.branch_city }}</td>
-                  <td class="text-end">₸{{ item.price }}</td>
+                  <td class="text-end">₸{{ item.price|spaced_thousands }}</td>
                   <td class="text-center">{{ item.quantity }}</td>
-                  <td class="text-end">₸{{ item.amount }}</td>
+                  <td class="text-end">₸{{ item.amount|spaced_thousands }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
               <tfoot>
                 <tr>
                   <td colspan="6" class="text-end"><strong>Итого:</strong></td>
-                  <td class="text-end"><strong>₸{{ order.total_amount }}</strong></td>
+                  <td class="text-end"><strong>₸{{ order.total_amount|spaced_thousands }}</strong></td>
                 </tr>
               </tfoot>
             </table>

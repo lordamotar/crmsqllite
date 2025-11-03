@@ -624,3 +624,49 @@ def client_lookup(request):
         'address_comment': (primary_addr.comment if primary_addr else ''),
         'phone': (primary_phone.phone if primary_phone else ''),
     })
+
+
+@login_required
+@require_http_methods(["POST"])
+def update_order_status(request):
+    """Обновить статус заказа (AJAX)."""
+    # Поддержим JSON и form-encoded
+    if request.headers.get('Content-Type', '').startswith('application/json'):
+        try:
+            payload = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            return HttpResponseBadRequest('Invalid JSON')
+        order_id = payload.get('order_id')
+        new_status = payload.get('status')
+    else:
+        order_id = request.POST.get('order_id')
+        new_status = request.POST.get('status')
+
+    if not order_id or not new_status:
+        return JsonResponse({'status': 'error', 'message': 'order_id и status обязательны'}, status=400)
+
+    order = get_object_or_404(Order, pk=order_id)
+
+    valid_values = {key for key, _ in Order.STATUS_CHOICES}
+    if new_status not in valid_values:
+        return JsonResponse({'status': 'error', 'message': 'Недопустимый статус'}, status=400)
+
+    order.status = new_status
+    order.updated_by = request.user
+    order.updated_at = timezone.now()
+    order.save(update_fields=['status', 'updated_by', 'updated_at'])
+
+    # Готовим данные для UI
+    display_map = dict(Order.STATUS_CHOICES)
+    from .templatetags.order_extras import status_text_class, status_css_class
+    text_class = status_text_class(new_status)
+    css_class = status_css_class(new_status)
+
+    return JsonResponse({
+        'status': 'success',
+        'order_id': order.id,
+        'new_status': new_status,
+        'status_display': display_map.get(new_status, new_status),
+        'text_class': text_class,
+        'css_class': css_class,
+    })
