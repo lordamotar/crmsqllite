@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load order_extras %}
+
+{% block title %}Аналитика — Обзор{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-6">
+    <h4 class="mb-0">Аналитика — Обзор</h4>
+    <div>
+      <a href="{% url 'analytics:by_manager_page' %}" class="btn btn-outline-primary me-2">По менеджерам</a>
+      <a href="{% url 'analytics:top_products_page' %}" class="btn btn-outline-primary">Топ товаров</a>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-body">
+      <form id="filters" class="row g-3 align-items-end">
+        <div class="col-sm-3">
+          <label class="form-label">Начало</label>
+          <input type="date" class="form-control" name="start">
+        </div>
+        <div class="col-sm-3">
+          <label class="form-label">Окончание</label>
+          <input type="date" class="form-control" name="end">
+        </div>
+        <div class="col-sm-3">
+          <label class="form-label">Источник</label>
+          <select class="form-control" name="source">
+            <option value="">— Все —</option>
+            {% for s in sources %}
+              <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-3">
+          <label class="form-label">Статусы (через запятую)</label>
+          <input type="text" class="form-control" name="statuses" placeholder="completed,cancelled">
+        </div>
+        <div class="col-sm-3">
+          <label class="form-label">Менеджер</label>
+          <select class="form-control" name="manager">
+            <option value="">— Все —</option>
+            {% for m in managers %}
+              <option value="{{ m.id }}">{% if m.last_name %}{{ m.last_name }} {{ m.first_name }}{% else %}{{ m.username }}{% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6 d-flex align-items-end gap-2">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-label-secondary" data-preset="month">Текущий месяц</button>
+            <button type="button" class="btn btn-label-secondary" data-preset="last_month">Прошлый месяц</button>
+            <button type="button" class="btn btn-label-secondary" data-preset="today">Сегодня</button>
+          </div>
+          <button type="submit" class="btn btn-primary">Применить</button>
+          <button type="button" id="resetBtn" class="btn btn-label-secondary">Сброс</button>
+          <a id="exportBtn" class="btn btn-outline-primary" href="#">Экспорт CSV</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-6">
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Всего заказов</div>
+          <h4 id="m-orders" class="mb-0">0</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Выполнено</div>
+          <h4 id="m-completed" class="mb-0">0</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Отменено</div>
+          <h4 id="m-cancelled" class="mb-0">0</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="text-muted">Выручка</div>
+          <h4 id="m-revenue" class="mb-0">₸0</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-6">
+    <div class="card-header">
+      <h5 class="card-title mb-0">Динамика по дням</h5>
+    </div>
+    <div class="card-body">
+      <div id="tsChart"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  function toQuery(params){
+    const p = new URLSearchParams();
+    Object.entries(params).forEach(([k,v])=>{ if(v) p.set(k, v); });
+    return p.toString();
+  }
+
+  function fmtInt(n){
+    try { return (parseInt(n||0,10)).toLocaleString('ru-RU'); } catch(_) { return n; }
+  }
+
+  function fmtMoney(n){
+    try { return (parseInt(n||0,10)).toLocaleString('ru-RU'); } catch(_) { return n; }
+  }
+
+  const form = document.getElementById('filters');
+  const resetBtn = document.getElementById('resetBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const elOrders = document.getElementById('m-orders');
+  const elCompleted = document.getElementById('m-completed');
+  const elCancelled = document.getElementById('m-cancelled');
+  const elRevenue = document.getElementById('m-revenue');
+
+  async function load(){
+    const params = Object.fromEntries(new FormData(form).entries());
+    const q = toQuery(params);
+    exportBtn.href = `/analytics/data/export.csv?${q}`;
+    const [ovr, ts] = await Promise.all([
+      fetch(`/analytics/data/overview/?${q}`),
+      fetch(`/analytics/data/timeseries/?${q}`)
+    ]);
+    const data = await ovr.json();
+    elOrders.textContent = fmtInt(data.orders_total);
+    elCompleted.textContent = fmtInt(data.orders_completed);
+    elCancelled.textContent = fmtInt(data.orders_cancelled);
+    elRevenue.textContent = '₸' + fmtMoney(data.sum_total);
+
+    const tsData = await ts.json();
+    const dates = (tsData || []).map(r=>r.date);
+    const revenue = (tsData || []).map(r=>r.revenue);
+    const orders = (tsData || []).map(r=>r.orders);
+
+    const options = {
+      chart: { type: 'area', height: 280, toolbar: { show: false } },
+      series: [
+        { name: 'Выручка', data: revenue },
+        { name: 'Заказы', data: orders }
+      ],
+      xaxis: { categories: dates },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth' },
+      colors: ['#696cff', '#71dd37']
+    };
+    const el = document.getElementById('tsChart');
+    el.innerHTML = '';
+    if (!dates.length) {
+      el.innerHTML = '<div class="text-center text-muted py-4">Нет данных за выбранный период</div>';
+    } else {
+      new ApexCharts(el, options).render();
+    }
+  }
+
+  form.addEventListener('submit', function(e){ e.preventDefault(); load(); });
+  resetBtn.addEventListener('click', function(){ form.reset(); load(); });
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const now = new Date();
+      const startEl = form.querySelector('[name="start"]');
+      const endEl = form.querySelector('[name="end"]');
+      function fmt(d){ return d.toISOString().slice(0,10); }
+      const preset = btn.getAttribute('data-preset');
+      if (preset === 'today') {
+        const d = fmt(now);
+        startEl.value = d; endEl.value = d;
+      } else if (preset === 'last_month') {
+        const firstThis = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+        const lastPrev = new Date(firstThis - 24*3600*1000);
+        const firstPrev = new Date(Date.UTC(lastPrev.getUTCFullYear(), lastPrev.getUTCMonth(), 1));
+        startEl.value = fmt(firstPrev); endEl.value = fmt(lastPrev);
+      } else { // month
+        const first = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+        startEl.value = fmt(first); endEl.value = fmt(now);
+      }
+      load();
+    });
+  });
+  // дефолт: текущий месяц если пусто
+  (function initDefaults(){
+    const s = form.querySelector('[name="start"]');
+    const e = form.querySelector('[name="end"]');
+    if (!s.value || !e.value) {
+      const now = new Date();
+      function fmt(d){ return d.toISOString().slice(0,10); }
+      const first = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+      s.value = fmt(first); e.value = fmt(now);
+    }
+  })();
+  load();
+})();
+</script>
+{% endblock %}
+
+

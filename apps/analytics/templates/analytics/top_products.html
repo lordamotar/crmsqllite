@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load order_extras %}
+
+{% block title %}Аналитика — Топ товаров{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center mb-6">
+    <h4 class="mb-0">Аналитика — Топ товаров</h4>
+    <div>
+      <a href="{% url 'analytics:overview_page' %}" class="btn btn-outline-primary me-2">Обзор</a>
+      <a href="{% url 'analytics:by_manager_page' %}" class="btn btn-outline-primary">По менеджерам</a>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-body">
+      <form id="filters" class="row g-3 align-items-end">
+        <div class="col-sm-3">
+          <label class="form-label">Начало</label>
+          <input type="date" class="form-control" name="start">
+        </div>
+        <div class="col-sm-3">
+          <label class="form-label">Окончание</label>
+          <input type="date" class="form-control" name="end">
+        </div>
+        <div class="col-sm-2">
+          <label class="form-label">Limit</label>
+          <input type="number" class="form-control" name="limit" value="10" min="1" max="100">
+        </div>
+        <div class="col-sm-2">
+          <label class="form-label">Статусы</label>
+          <input type="text" class="form-control" name="statuses" placeholder="completed,cancelled">
+        </div>
+        <div class="col-sm-2">
+          <label class="form-label">Источник</label>
+          <select class="form-control" name="source">
+            <option value="">— Все —</option>
+            {% for s in sources %}
+              <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6 d-flex align-items-end gap-2">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-label-secondary" data-preset="month">Текущий месяц</button>
+            <button type="button" class="btn btn-label-secondary" data-preset="last_month">Прошлый месяц</button>
+            <button type="button" class="btn btn-label-secondary" data-preset="today">Сегодня</button>
+          </div>
+          <button type="submit" class="btn btn-primary">Применить</button>
+          <button type="button" id="resetBtn" class="btn btn-label-secondary">Сброс</button>
+          <a id="exportBtn" class="btn btn-outline-primary" href="#">Экспорт CSV</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title mb-0">Выручка по товарам</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Код</th>
+            <th>Товар</th>
+            <th class="text-end">Количество</th>
+            <th class="text-end">Выручка</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="card-body">
+      <div id="productsChart"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  function toQuery(params){ const p = new URLSearchParams(); Object.entries(params).forEach(([k,v])=>{ if(v) p.set(k, v); }); return p.toString(); }
+  function fmtInt(n){ try { return (parseInt(n||0,10)).toLocaleString('ru-RU'); } catch(_) { return n; } }
+  function fmtMoney(n){ try { return (parseInt(n||0,10)).toLocaleString('ru-RU'); } catch(_) { return n; } }
+
+  const form = document.getElementById('filters');
+  const resetBtn = document.getElementById('resetBtn');
+  const tbody = document.getElementById('tbody');
+  const exportBtn = document.getElementById('exportBtn');
+
+  async function load(){
+    const params = Object.fromEntries(new FormData(form).entries());
+    const q = toQuery(params);
+    const res = await fetch(`/analytics/data/top-products/?${q}`);
+    const data = await res.json();
+    exportBtn.href = `/analytics/data/export.csv?${q}`;
+    tbody.innerHTML = (data && data.length ? data : []).map(r => `
+      <tr>
+        <td>${r.product_code || '—'}</td>
+        <td>${r.product_name || '—'}</td>
+        <td class="text-end">${fmtInt(r.quantity)}</td>
+        <td class="text-end">₸${fmtMoney(r.revenue)}</td>
+      </tr>
+    `).join('');
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Нет данных</td></tr>';
+    }
+
+    // Chart
+    const labels = data.map(r => (r.product_code || r.product_name || '—'));
+    const revenues = data.map(r => parseInt(r.revenue||0,10));
+    const options = {
+      chart: { type: 'bar', height: 320, toolbar: { show: false } },
+      series: [{ name: 'Выручка', data: revenues }],
+      xaxis: { categories: labels, labels: { rotate: -30, trim: true }},
+      dataLabels: { enabled: false },
+      colors: ['#71dd37']
+    };
+    const el = document.getElementById('productsChart');
+    el.innerHTML = '';
+    if (!labels.length) {
+      el.innerHTML = '<div class="text-center text-muted py-2">Нет данных</div>';
+    } else {
+      new ApexCharts(el, options).render();
+    }
+  }
+
+  form.addEventListener('submit', function(e){ e.preventDefault(); load(); });
+  resetBtn.addEventListener('click', function(){ form.reset(); load(); });
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const now = new Date();
+      const startEl = form.querySelector('[name="start"]');
+      const endEl = form.querySelector('[name="end"]');
+      function fmt(d){ return d.toISOString().slice(0,10); }
+      const preset = btn.getAttribute('data-preset');
+      if (preset === 'today') {
+        const d = fmt(now);
+        startEl.value = d; endEl.value = d;
+      } else if (preset === 'last_month') {
+        const firstThis = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+        const lastPrev = new Date(firstThis - 24*3600*1000);
+        const firstPrev = new Date(Date.UTC(lastPrev.getUTCFullYear(), lastPrev.getUTCMonth(), 1));
+        startEl.value = fmt(firstPrev); endEl.value = fmt(lastPrev);
+      } else { // month
+        const first = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+        startEl.value = fmt(first); endEl.value = fmt(now);
+      }
+      load();
+    });
+  });
+  (function initDefaults(){
+    const s = form.querySelector('[name="start"]');
+    const e = form.querySelector('[name="end"]');
+    if (!s.value || !e.value) {
+      const now = new Date();
+      function fmt(d){ return d.toISOString().slice(0,10); }
+      const first = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+      s.value = fmt(first); e.value = fmt(now);
+    }
+  })();
+  load();
+})();
+</script>
+{% endblock %}
+
+

@@ -165,18 +165,18 @@
                       required />
                     <label for="password">Пароль</label>
                   </div>
-                  <span class="input-group-text cursor-pointer" onclick="togglePassword()">
-                    <i class="icon-base ri ri-eye-off-line icon-20px" id="password-toggle-icon"></i>
+                  <span class="input-group-text cursor-pointer" id="password-toggle">
+                    <i class="icon-base ri icon-20px ri-eye-off-line" id="password-toggle-icon"></i>
                   </span>
                 </div>
               </div>
             </div>
             <div class="mb-5 pb-2 d-flex justify-content-between pt-2 align-items-center">
               <div class="form-check mb-0">
-                <input class="form-check-input" type="checkbox" id="remember-me" name="remember_me" />
+                <input class="form-check-input" type="checkbox" id="remember-me" name="remember_me" value="1" />
                 <label class="form-check-label" for="remember-me">Запомнить меня</label>
               </div>
-              <a href="#" class="float-end mb-1">
+              <a href="javascript:void(0)" class="float-end mb-1" onclick="alert('Сброс пароля выполняется администратором. Обратитесь к администратору.');" title="Сброс пароля">
                 <span>Забыли пароль?</span>
               </a>
             </div>
@@ -187,7 +187,7 @@
 
           <p class="text-center mb-5">
             <span>Новый пользователь?</span>
-            <a href="#">
+            <a href="javascript:void(0)" onclick="alert('Создание аккаунта выполняется администратором. Обратитесь к администратору.');" title="Создать аккаунт">
               <span>Создать аккаунт</span>
             </a>
           </p>
@@ -221,20 +221,46 @@
 <script src="{% static 'frontend/assets/js/main.js' %}"></script>
 
 <script>
-function togglePassword() {
+document.addEventListener('DOMContentLoaded', function() {
+  const passwordToggle = document.getElementById('password-toggle');
   const passwordInput = document.getElementById('password');
   const toggleIcon = document.getElementById('password-toggle-icon');
   
-  if (passwordInput.type === 'password') {
-    passwordInput.type = 'text';
-    toggleIcon.classList.remove('ri-eye-off-line');
-    toggleIcon.classList.add('ri-eye-line');
-  } else {
-    passwordInput.type = 'password';
-    toggleIcon.classList.remove('ri-eye-line');
-    toggleIcon.classList.add('ri-eye-off-line');
+  if (!passwordToggle || !passwordInput || !toggleIcon) {
+    console.error('Элементы не найдены');
+    return;
   }
-}
+  
+  passwordToggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      // Убираем text-security если установлен
+      passwordInput.style.webkitTextSecurity = 'none';
+      passwordInput.style.textSecurity = 'none';
+      // Удаляем placeholder при показе пароля
+      passwordInput.removeAttribute('placeholder');
+      toggleIcon.classList.remove('ri-eye-off-line');
+      toggleIcon.classList.add('ri-eye-line');
+    } else {
+      passwordInput.type = 'password';
+      // Восстанавливаем placeholder при скрытии, если поле пустое
+      if (!passwordInput.value) {
+        passwordInput.setAttribute('placeholder', '············');
+      }
+      toggleIcon.classList.remove('ri-eye-line');
+      toggleIcon.classList.add('ri-eye-off-line');
+    }
+    // Принудительно обновляем отображение
+    const currentValue = passwordInput.value;
+    passwordInput.value = '';
+    setTimeout(function() {
+      passwordInput.value = currentValue;
+    }, 0);
+  });
+});
 </script>
 </body>
 </html>

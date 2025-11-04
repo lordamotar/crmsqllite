@@ -46,26 +46,6 @@
 
       <div id="step-1" class="step">
         <div class="row g-4 align-items-end">
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">
-              <i class="ri-barcode-line me-1"></i>
-              Код товара
-            </label>
-            <input id="productCode" type="text" class="form-control" placeholder="Введите код товара" />
-          </div>
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">
-              <i class="ri-shopping-bag-line me-1"></i>
-              Товар
-            </label>
-            <input id="productSelect" type="text" class="form-control" placeholder="Начните вводить код или название товара" autocomplete="off" />
-            <!-- Скрытый select для хранения данных о товарах -->
-            <select id="productSelectHidden" style="display: none;">
-              <option value="">— Выберите товар —</option>
-            </select>
-            <!-- Результаты поиска -->
-            <div id="productSearchResults" class="dropdown-menu w-100" style="display: none; max-height: 300px; overflow-y: auto;"></div>
-          </div>
           <div class="col-md-2">
             <label class="form-label fw-semibold">
               <i class="ri-money-dollar-circle-line me-1"></i>
@@ -75,10 +55,10 @@
           </div>
           <div class="col-md-2">
             <label class="form-label fw-semibold">
-              <i class="ri-number-1 me-1"></i>
+              <i class="ri-hashtag me-1"></i>
               Кол-во
             </label>
-            <input id="productQty" type="number" class="form-control form-control-sm" value="1" min="1" />
+            <input id="productQty" type="number" class="form-control form-control-sm" value="0" min="1" />
           </div>
           <div class="col-md-2">
             <label class="form-label fw-semibold">
@@ -91,9 +71,6 @@
               <option value="wholesale">Оптовая</option>
             </select>
           </div>
-        </div>
-
-        <div class="row g-4 mt-2">
           <div class="col-md-3">
             <label class="form-label fw-semibold">
               <i class="ri-map-pin-line me-1"></i>
@@ -122,32 +99,79 @@
             </label>
             <input id="productBranch" type="text" class="form-control" readonly />
           </div>
+        </div>
+        <!-- Расширенный поиск и фильтры -->
+        <div class="row g-4 align-items-end mt-2">
           <div class="col-md-3">
-            <label class="form-label fw-semibold">
-              <i class="ri-truck-line me-1"></i>
-              Тип шины
-            </label>
-            <input id="productTireType" type="text" class="form-control" readonly disabled />
+            <label class="form-label fw-semibold"><i class="ri-barcode-line me-1"></i> Код / название</label>
+            <input id="productSearchInput" type="text" class="form-control" placeholder="Код или название" />
           </div>
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">
-              <i class="ri-folder-line me-1"></i>
-              Ассортиментная группа
-            </label>
-            <input id="productAssortmentGroup" type="text" class="form-control" readonly disabled />
+
+          <div class="col-md-2">
+            <label class="form-label fw-semibold"><i class="ri-stack-line me-1"></i> Название</label>
+            <input id="productNameInput" type="text" class="form-control" placeholder="Напр. Nokian Hakkapeliitta" />
+          </div>
+
+          <div class="col-md-2">
+            <label class="form-label fw-semibold"><i class="ri-snowy-line me-1"></i> Сезон</label>
+            <select id="productSeasonSelect" class="form-control">
+              <option value="">Все</option>
+              <option value="ЗИМ">ЗИМ — Зимние</option>
+              <option value="ШИП">ШИП — Шипованные</option>
+              <option value="ВС">ВС — Всесезонные</option>
+              <option value="ДР">ДР — Летние</option>
+              <option value="ПП">ПП — Повышенной проходимости</option>
+              <option value="УВ">УВ — Универсальные</option>
+              <option value="РУО">РУО — Рулевые</option>
+              <option value="ВДО">ВДО — Ведущие</option>
+              <option value="ПРО">ПРО — Прицепные</option>
+              <option value="КАР">КАР — Карьерный</option>
+              <option value="Без рисунка">Без рисунка</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-semibold"><i class="ri-map-pin-line me-1"></i> Город (фильтр)</label>
+            <select id="productSearchCity" class="form-control">
+              <option value="">Любой</option>
+              <option value="Актобе">Актобе</option>
+              <option value="Алматы">Алматы</option>
+              <option value="Астана">Астана</option>
+              <option value="Караганда">Караганда</option>
+              <option value="Павлодар">Павлодар</option>
+              <option value="Петропавловск">Петропавловск</option>
+              <option value="Семей">Семей</option>
+              <option value="Усть-Каменогорск">Усть-Каменогорск</option>
+              <option value="Шымкент">Шымкент</option>
+              <option value="Уральск">Уральск</option>
+              <option value="Кызылорда">Кызылорда</option>
+              <option value="Центральный Склад">Центральный Склад</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button id="productFindBtn" class="btn btn-primary w-100">Найти</button>
           </div>
         </div>
 
-        <div class="row g-4 mt-3">
-          <div class="col-md-2">
-            <button id="addItemBtn" class="btn btn-primary w-100 d-flex align-items-center justify-content-center py-3">
-              <i class="ri-add-line me-2"></i>
-              <span>Добавить товар</span>
-            </button>
-          </div>
+        <!-- Результаты поиска -->
+        <div class="table-responsive border rounded mt-3" id="productResultsWrapper" style="display:none;">
+          <table class="table table-hover mb-0" id="productResultsTable">
+            <thead class="table-light">
+              <tr>
+                <th>Код</th>
+                <th>Номенклатура</th>
+                <th>Размер</th>
+                <th>Сезон</th>
+                <th>Город</th>
+                <th class="text-end">Цена</th>
+                <th class="text-center">Уровни</th>
+                <th class="text-center">Действие</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="p-3 text-end small text-muted">Выберите позицию и нажмите «Добавить» для корзины.</div>
         </div>
         <hr class="my-5" />
-
         <div class="table-responsive border rounded">
           <table class="table table-hover mb-0" id="itemsTable">
             <thead class="table-light">
@@ -442,18 +466,16 @@
   let current = 1;
   const items = [];
 
-  const productSelect = document.getElementById('productSelect');
-  const productSelectHidden = document.getElementById('productSelectHidden');
-  const productCodeInput = document.getElementById('productCode');
+  // Убраны устаревшие поля быстрого поиска (код/селект)
   const priceInput = document.getElementById('productPrice');
   const qtyInput = document.getElementById('productQty');
   const priceLevelSelect = document.getElementById('priceLevelSelect');
-  const addItemBtn = document.getElementById('addItemBtn');
+  // Добавление теперь осуществляется из таблицы результатов (кнопка "Добавить")
   const itemsTableBody = document.querySelector('#itemsTable tbody');
   const totalCell = document.getElementById('totalCell');
-  const productSearchResults = document.getElementById('productSearchResults');
+  // Убран выпадающий список старого поиска
   
-  let selectedProduct = null;  // Храним выбранный товар
+  // selectedProduct не используется в новом UI
 
   // Debounce helper для поиска товаров
   function debounce(func, wait) {
@@ -468,142 +490,183 @@
     };
   }
 
-  // Поиск товаров через AJAX
-  const searchProducts = debounce(async (query) => {
-    if (!query || query.length < 2) {
-      productSearchResults.style.display = 'none';
+  // ===== Расширенный поиск товаров (таблица 20 позиций) =====
+  const productSearchInput = document.getElementById('productSearchInput');
+  const productNameInput = document.getElementById('productNameInput');
+  const productSeasonSelect = document.getElementById('productSeasonSelect');
+  const productSearchCity = document.getElementById('productSearchCity');
+  const productFindBtn = document.getElementById('productFindBtn');
+
+  const productResultsWrapper = document.getElementById('productResultsWrapper');
+  const productResultsTableBody = document.querySelector('#productResultsTable tbody');
+
+  async function fetchProducts(params) {
+    const qs = new URLSearchParams(params).toString();
+    try {
+      const res = await fetch(`{% url 'orders:product_search' %}?${qs}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.products || [];
+    } catch (e) {
+      console.error('product fetch error', e);
+      return [];
+    }
+  }
+
+  async function doProductSearch() {
+    const q = productSearchInput ? productSearchInput.value.trim() : '';
+    // Поиск по названию продукта (Product.name)
+    const nameQuery = productNameInput ? productNameInput.value.trim() : '';
+    const season = productSeasonSelect ? productSeasonSelect.value : '';
+    // Приоритет города: фильтр поиска > селект города товара
+    const city = productSearchCity && productSearchCity.value ? productSearchCity.value : (productCitySelect ? productCitySelect.value : '');
+    const priceLevel = priceLevelSelect ? priceLevelSelect.value : 'retail';
+
+    // Если задано поле названия — используем его как основной запрос по name
+    const useNameOnly = !!nameQuery;
+    const params = { q: (nameQuery || q), size: '', season, city, price_level: priceLevel };
+    if (useNameOnly) params.search_field = 'name';
+
+    productResultsWrapper.style.display = 'none';
+    productResultsTableBody.innerHTML = `<tr><td colspan="8" class="text-center py-4">Поиск...</td></tr>`;
+
+    const products = await fetchProducts(params);
+
+    // Клиентская фильтрация по сезонности по правилам:
+    // конец имени/кода содержит один из тегов: ЗИМ, ШИП, ВС, ДР, ПП, УВ, РУО, ВДО, ПРО, КАР, Без рисунка
+    const filtered = season ? products.filter(p => matchesSeasonTag(p, season)) : products;
+    renderProductResults(filtered);
+  }
+
+  function matchesSeasonTag(prod, selectedTag) {
+    if (!selectedTag) return true;
+    const endTag = detectEndTag((prod && (prod.name || '')) + ' ' + (prod && (prod.code || '')));
+    if (endTag) return normalizeTag(endTag) === normalizeTag(selectedTag);
+    // также пробуем поля season/season_tags, если есть
+    if (prod && prod.season) return normalizeTag(prod.season) === normalizeTag(selectedTag);
+    if (Array.isArray(prod?.season_tags)) {
+      return prod.season_tags.some(t => normalizeTag(String(t)) === normalizeTag(selectedTag));
+    }
+    return false;
+  }
+
+  function normalizeTag(tag) {
+    const t = String(tag).trim().toUpperCase();
+    // Нормализуем различные написания к ключам из селекта
+    if (t.includes('БЕЗ')) return 'БЕЗ РИСУНКА';
+    return t;
+  }
+
+  function detectEndTag(text) {
+    if (!text) return null;
+    const s = String(text).trim();
+    // Ищем в конце строки один из тегов (с учётом возможных разделителей пробел/тире/скобки)
+    const re = /(?:\s|\(|-|^)(ЗИМ|ШИП|ВС|ДР|ПП|УВ|РУО|ВДО|ПРО|КАР|Без рисунка)\)?\s*$/i;
+    const m = s.match(re);
+    return m ? m[1] : null;
+  }
+
+  function renderProductResults(products) {
+    productResultsTableBody.innerHTML = '';
+    if (!products || !products.length) {
+      productResultsTableBody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">Ничего не найдено</td></tr>`;
+      productResultsWrapper.style.display = 'block';
       return;
     }
 
+    products.forEach(prod => {
+      const tr = document.createElement('tr');
+      const endTag = detectEndTag((prod && (prod.name || '')) + ' ' + (prod && (prod.code || '')));
+      const seasonLabel = endTag || (prod.season_tags && prod.season_tags.join(', ')) || (prod.season || '—');
+      const priceDisplay = (prod.price ? `₸${Number(prod.price).toLocaleString('ru-RU')}` : '—');
+      const levels = [];
+      if (prod.retail_price) levels.push('Розн');
+      if (prod.promotional_price) levels.push('Акц');
+      if (prod.wholesale_price) levels.push('Опт');
+
+      tr.innerHTML = `
+        <td>${prod.code || '—'}</td>
+        <td>
+          <strong>${prod.name}</strong><br>
+          <small class="text-muted">${prod.assortment_group || ''} ${prod.tire_type ? '• ' + prod.tire_type : ''}</small>
+        </td>
+        <td>${prod.size || '—'}</td>
+        <td>${seasonLabel}</td>
+        <td>${prod.branch_city || '—'}</td>
+        <td class="text-end">${priceDisplay}</td>
+        <td class="text-center"><small class="text-muted">${levels.join(', ')}</small></td>
+        <td class="text-center">
+          <button class="btn btn-sm btn-success product-add-btn" data-product='${encodeURIComponent(JSON.stringify(prod))}'>Добавить</button>
+        </td>
+      `;
+      productResultsTableBody.appendChild(tr);
+    });
+
+    productResultsWrapper.style.display = 'block';
+  }
+
+  // Добавление выбранной позиции в корзину из результатов
+  productResultsTableBody?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.product-add-btn');
+    if (!btn) return;
     try {
-      const response = await fetch(`{% url 'orders:product_search' %}?q=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      
-      if (data.products && data.products.length > 0) {
-        productSearchResults.innerHTML = data.products.map(product => `
-          <div class="dropdown-item" style="cursor: pointer;" data-product='${JSON.stringify(product)}'>
-            <div class="d-flex justify-content-between">
-              <div>
-                <strong>${product.name}</strong><br>
-                <small class="text-muted">Код: ${product.code || '—'}</small>
-              </div>
-              <div class="text-end">
-                <div>₸${product.price.toLocaleString()}</div>
-                ${product.wholesale_price ? `<small class="text-muted">Опт: ₸${product.wholesale_price.toLocaleString()}</small>` : ''}
-              </div>
-            </div>
-          </div>
-        `).join('');
-        productSearchResults.style.display = 'block';
-      } else {
-        productSearchResults.innerHTML = '<div class="dropdown-item text-muted">Товары не найдены</div>';
-        productSearchResults.style.display = 'block';
+      const prod = JSON.parse(decodeURIComponent(btn.getAttribute('data-product')));
+      const chosenCity = (productSearchCity && productSearchCity.value) || (productCitySelect ? productCitySelect.value : '');
+      const chosenPriceLevel = priceLevelSelect ? priceLevelSelect.value : '';
+
+      // Валидации: город, уровень цен, количество
+      if (!chosenCity) {
+        alert('Выберите город перед добавлением товара');
+        return;
       }
-    } catch (error) {
-      console.error('Ошибка поиска товаров:', error);
-      productSearchResults.style.display = 'none';
-    }
-  }, 300);
-
-  // Обработчик ввода в поле поиска товаров
-  productSelect.addEventListener('input', (e) => {
-    const query = e.target.value.trim();
-    if (query) {
-      searchProducts(query);
-    } else {
-      productSearchResults.style.display = 'none';
-      selectedProduct = null;
-      // Очищаем только поля товара, но не код
-      if (productBranch) productBranch.value = '';
-      if (productTireType) productTireType.value = '';
-      if (productAssortmentGroup) productAssortmentGroup.value = '';
-      if (priceInput) priceInput.value = '';
-    }
-  });
-
-  // Поиск товара по коду с debounce
-  const searchProductByCode = debounce(async (code) => {
-    if (!code) {
-      clearProductFields();
-      selectedProduct = null;
-      return;
-    }
-
-    // Поиск товара по коду
-    try {
-      const response = await fetch(`{% url 'orders:product_search' %}?q=${encodeURIComponent(code)}`);
-      const data = await response.json();
-      
-      if (data.products && data.products.length > 0) {
-        // Ищем точное совпадение по коду
-        const exactMatch = data.products.find(product => 
-          product.code && product.code.toLowerCase() === code.toLowerCase()
-        );
-        
-        if (exactMatch) {
-          selectedProduct = exactMatch;
-          productSelect.value = exactMatch.name;
-          updateProductFields(exactMatch);
-          productSearchResults.style.display = 'none';
-          console.log('Товар найден и выбран:', exactMatch);
-        } else {
-          // Если точного совпадения нет, показываем результаты поиска
-          productSearchResults.innerHTML = data.products.map(product => `
-            <div class="dropdown-item" style="cursor: pointer;" data-product='${JSON.stringify(product)}'>
-              <div class="d-flex justify-content-between">
-                <div>
-                  <strong>${product.name}</strong><br>
-                  <small class="text-muted">Код: ${product.code || '—'}</small>
-                </div>
-                <div class="text-end">
-                  <div>₸${product.price.toLocaleString()}</div>
-                  ${product.wholesale_price ? `<small class="text-muted">Опт: ₸${product.wholesale_price.toLocaleString()}</small>` : ''}
-                </div>
-              </div>
-            </div>
-          `).join('');
-          productSearchResults.style.display = 'block';
-        }
-      } else {
-        // Если товары не найдены, очищаем поля товара
-        clearProductFields();
-        selectedProduct = null;
-        productSearchResults.innerHTML = '<div class="dropdown-item text-muted">Товары не найдены</div>';
-        productSearchResults.style.display = 'block';
+      if (!chosenPriceLevel) {
+        alert('Выберите уровень цен перед добавлением товара');
+        return;
       }
-    } catch (error) {
-      console.error('Ошибка поиска товаров по коду:', error);
-      productSearchResults.style.display = 'none';
-      // При ошибке очищаем поля товара
-      clearProductFields();
-      selectedProduct = null;
-    }
-  }, 300);
+      const quantity = Math.max(0, parseInt(qtyInput && qtyInput.value ? qtyInput.value : '0', 10));
+      if (!Number.isFinite(quantity) || quantity < 1) {
+        alert('Укажите количество (минимум 1) перед добавлением товара');
+        return;
+      }
 
-  // Обработчик ввода в поле кода товара
-  productCodeInput.addEventListener('input', (e) => {
-    const code = e.target.value.trim();
-    searchProductByCode(code);
-  });
+      // Определяем цену в зависимости от выбранного уровня
+      let price = prod.price || 0;
+      if (chosenPriceLevel === 'wholesale' && prod.wholesale_price) price = prod.wholesale_price;
+      if (chosenPriceLevel === 'promotional' && prod.promotional_price) price = prod.promotional_price;
+      if (chosenPriceLevel === 'retail' && (prod.retail_price || prod.price)) price = (prod.retail_price || prod.price);
 
-  // Обработчик клика по результату поиска
-  productSearchResults.addEventListener('click', (e) => {
-    const item = e.target.closest('[data-product]');
-    if (item) {
-      selectedProduct = JSON.parse(item.getAttribute('data-product'));
-      productSelect.value = selectedProduct.name;
-      productCodeInput.value = selectedProduct.code || '';
-      updateProductFields(selectedProduct);
-      productSearchResults.style.display = 'none';
-    }
-  });
+      items.push({
+        product_id: prod.id,
+        name: prod.name,
+        code: prod.code || '',
+        price: Number(price),
+        quantity,
+        city: chosenCity
+      });
+      renderItems();
 
-  // Скрытие результатов при клике вне поля
-  document.addEventListener('click', (e) => {
-    if (!productSelect.contains(e.target) && !productSearchResults.contains(e.target)) {
-      productSearchResults.style.display = 'none';
+      // Мягкий скролл к корзине
+      document.querySelector('#itemsTable')?.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      console.error('parse product', err);
     }
   });
+
+  // Кнопка «Найти» и Enter в поле
+  productFindBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    doProductSearch();
+  });
+  productSearchInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      doProductSearch();
+    }
+  });
+
+  // Удалён старый dropdown-поиск; используем таблицу результатов
+
+  // Убран кодовый поиск и dropdown-результаты
 
   // Функция обновления полей товара
   function updateProductFields(product) {
@@ -880,46 +943,7 @@
     renderItems();
   });
 
-  addItemBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    
-    if (!selectedProduct) {
-      alert('Сначала выберите товар из списка');
-      return;
-    }
-    
-    // Проверяем, что выбран город
-    const selectedCity = productCitySelect ? productCitySelect.value : '';
-    if (!selectedCity) {
-      alert('Выберите город');
-      return;
-    }
-    
-    const manualCode = (productCodeInput ? productCodeInput.value : '').trim();
-    const code = manualCode || selectedProduct.code || '';
-    
-    // Получаем цену из поля или используем цену товара
-    let price = parseFloat(priceInput && priceInput.value ? priceInput.value : 'NaN');
-    if (!isFinite(price)) {
-      price = selectedProduct.price;
-    }
-    
-    const quantity = Math.max(1, parseInt(qtyInput.value || '1'));
-    
-    items.push({ 
-      product_id: selectedProduct.id, 
-      name: selectedProduct.name, 
-      code, 
-      price, 
-      quantity, 
-      city: selectedCity 
-    });
-    
-    renderItems();
-    
-    // Очищаем поля после добавления
-    clearAllFields();
-  });
+  // Кнопка addItem из старого UI удалена
 
   function getCookie(name) {
     const value = `; ${document.cookie}`;

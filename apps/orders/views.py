@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+import logging
 from django.core.cache import cache
 import json
 from decimal import Decimal
@@ -537,16 +538,24 @@ def edit_order(request, pk):
 @login_required
 @require_http_methods(["GET"])
 def product_search(request):
-    """Поиск товаров по коду или названию (AJAX)."""
+    """Поиск товаров. Поддержка выбора поля: name-only через search_field=name."""
     query = request.GET.get('q', '').strip()
+    search_field = (request.GET.get('search_field') or '').strip().lower()
+    logger = logging.getLogger('django')
     if not query:
+        logger.info('product_search: empty query')
         return JsonResponse({'products': []})
-    
-    # Поиск по коду или названию
-    products = Product.objects.filter(
-        Q(code__icontains=query) | Q(name__icontains=query),
-        is_active=True
-    ).select_related('branch_city').only(
+
+    # Базовый queryset
+    qs = Product.objects.filter(is_active=True)
+
+    # Фильтр по полю
+    if search_field == 'name':
+        qs = qs.filter(name__icontains=query)
+    else:
+        qs = qs.filter(Q(code__icontains=query) | Q(name__icontains=query))
+
+    products = qs.select_related('branch_city').only(
         'id', 'name', 'code', 'price', 'wholesale_price', 
         'promotional_price', 'retail_price', 'assortment_group', 
         'tire_type', 'branch_city__name'
@@ -567,6 +576,10 @@ def product_search(request):
             'branch_city': product.branch_city.name if product.branch_city else '',
         })
     
+    logger.info(
+        'product_search: field=%s q="%s" results=%d',
+        (search_field or 'code|name'), query, len(results)
+    )
     return JsonResponse({'products': results})
 
 

@@ -128,10 +128,15 @@ def login_view(request):
                     login(request, user)
                     
                     # Настройка сессии для "запомнить меня"
-                    if not remember_me:
-                        request.session.set_expiry(0)  # Сессия истекает при закрытии браузера
+                    # remember_me будет "1" если чекбокс отмечен, None если не отмечен
+                    if remember_me:
+                        # Сессия на 2 недели
+                        request.session.set_expiry(1209600)
+                        request.session.modified = True
                     else:
-                        request.session.set_expiry(1209600)  # 2 недели
+                        # Сессия истекает при закрытии браузера
+                        request.session.set_expiry(0)
+                        request.session.modified = True
                     
                     # Перенаправление на следующую страницу
                     next_page = request.GET.get('next', 'dashboard:dashboard')
