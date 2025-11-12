@@ -225,13 +225,20 @@ class OrderItem(models.Model):
 
     def save(self, *args, **kwargs):
         """Автоматическое копирование данных товара и расчёт суммы"""
-        if self.product and not self.product_code:
-            self.product_code = self.product.code
-            self.product_name = self.product.name
-            # Выбираем цену в зависимости от уровня цен заказа
-            self.price = self._get_price_by_level()
-            self.segment = self.product.assortment_group or ''
-            self.tire_type = self.product.tire_type or ''
+        if self.product:
+            # Заполняем базовые поля, если они пустые
+            if not self.product_code:
+                self.product_code = self.product.code
+            if not self.product_name:
+                self.product_name = self.product.name
+            # Выбираем цену в зависимости от уровня цен заказа (если не задана)
+            if not self.price:
+                self.price = self._get_price_by_level()
+            # Заполняем segment и tire_type, если они пустые
+            if not self.segment:
+                self.segment = self.product.assortment_group or ''
+            if not self.tire_type:
+                self.tire_type = self.product.tire_type or ''
             # Город филиала заполняется только если не задан явно
             if not self.branch_city:
                 # Берём город: приоритет у филиала->город, затем legacy branch_city

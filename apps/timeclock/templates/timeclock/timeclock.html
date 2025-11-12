@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Табель учёта рабочего времени{% endblock %}
+
+{% block styles %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Табель /</span> Учёт рабочего времени
+  </h4>
+
+  <!-- Кнопки управления перенесены на Dashboard -->
+
+  <!-- Календарь -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Календарь рабочих дней</h5>
+          <button id="exportBtn" class="btn btn-primary btn-sm waves-effect waves-light">
+            <i class="ri-download-line me-1"></i>Экспорт Excel
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модал отметки дня -->
+  <div class="modal fade" id="markModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Отметка дня</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">Дата: <strong id="markDateLabel"></strong></p>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-secondary" data-code="В">В выходной</button>
+            <button class="btn btn-outline-primary" data-code="К">К командировка</button>
+            <button class="btn btn-outline-warning" data-code="А">А без содержания</button>
+            <button class="btn btn-outline-danger" data-code="Б">Б больничный</button>
+            <button class="btn btn-outline-success" data-code="О">О отпуск</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- История сессий -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">История сессий</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Дата начала</th>
+                  <th>Время начала</th>
+                  <th>Время окончания</th>
+                  <th>Длительность</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody id="sessionsTable">
+                <tr>
+                  <td colspan="5" class="text-center">Загрузка...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/ru.global.min.js"></script>
+<script>
+(function() {
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+    document.cookie.match(/csrftoken=([^;]+)/)?.[1];
+
+  let calendar;
+  let heartbeatInterval;
+
+  // Получить CSRF токен для AJAX
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  const csrfToken = csrftoken || getCookie('csrftoken');
+
+  // Обновить статус сессии
+  async function updateSessionStatus() {
+    try {
+      const res = await fetch('/api/timeclock/status/', {
+        headers: {'X-CSRFToken': csrfToken}
+      });
+      const data = await res.json();
+      
+      if (data.has_session) {
+        document.getElementById('sessionStatus').textContent = 'В работе';
+        document.getElementById('startWorkBtn').style.display = 'none';
+        document.getElementById('stopWorkBtn').style.display = 'inline-block';
+        const startTime = new Date(data.start_time);
+        const duration = data.duration_hours;
+        document.getElementById('sessionDuration').textContent = 
+          `Начало: ${startTime.toLocaleTimeString('ru-RU')} | Отработано: ${duration.toFixed(2)} ч.`;
+      } else {
+        document.getElementById('sessionStatus').textContent = 'Не в работе';
+        document.getElementById('startWorkBtn').style.display = 'inline-block';
+        document.getElementById('stopWorkBtn').style.display = 'none';
+        document.getElementById('sessionDuration').textContent = '';
+      }
+    } catch (e) {
+      console.error('Ошибка получения статуса:', e);
+    }
+  }
+
+  // Начать работу
+  async function startWork() {
+    try {
+      const res = await fetch('/api/timeclock/start/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrfToken}
+      });
+      const data = await res.json();
+      if (res.ok) {
+        await updateSessionStatus();
+        if (calendar) calendar.refetchEvents();
+      } else {
+        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+      }
+    } catch (e) {
+      console.error('Ошибка старта:', e);
+      alert('Ошибка при запуске сессии');
+    }
+  }
+
+  // Завершить работу
+  async function stopWork() {
+    try {
+      const res = await fetch('/api/timeclock/stop/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrfToken}
+      });
+      const data = await res.json();
+      if (res.ok) {
+        await updateSessionStatus();
+        if (calendar) calendar.refetchEvents();
+        loadSessions();
+      } else {
+        alert('Ошибка: ' + (data.detail || 'Неизвестная ошибка'));
+      }
+    } catch (e) {
+      console.error('Ошибка остановки:', e);
+      alert('Ошибка при завершении сессии');
+    }
+  }
+
+  // Heartbeat
+  async function sendHeartbeat() {
+    try {
+      await fetch('/api/timeclock/heartbeat/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrfToken}
+      });
+    } catch (e) {
+      console.error('Ошибка heartbeat:', e);
+    }
+  }
+
+  // Загрузить сессии
+  async function loadSessions() {
+    try {
+      const res = await fetch('/api/timeclock/my_sessions/?limit=30', {
+        headers: {'X-CSRFToken': csrfToken}
+      });
+      const data = await res.json();
+      const tbody = document.getElementById('sessionsTable');
+      
+      if (data.sessions && data.sessions.length > 0) {
+        tbody.innerHTML = data.sessions.map(s => {
+          const start = new Date(s.start_time);
+          const end = s.end_time ? new Date(s.end_time) : null;
+          const status = s.is_closed ? '<span class="badge bg-success">Завершена</span>' : 
+            '<span class="badge bg-warning">Активна</span>';
+          return `
+            <tr>
+              <td>${start.toLocaleDateString('ru-RU')}</td>
+              <td>${start.toLocaleTimeString('ru-RU')}</td>
+              <td>${end ? end.toLocaleTimeString('ru-RU') : '-'}</td>
+              <td>${s.duration_hours.toFixed(2)} ч.</td>
+              <td>${status}</td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Нет данных</td></tr>';
+      }
+    } catch (e) {
+      console.error('Ошибка загрузки сессий:', e);
+    }
+  }
+
+  // Инициализация календаря
+  function initCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'ru',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth'
+      },
+      events: async function(info) {
+        try {
+          // Сессии
+          const [sessionsRes, marksRes] = await Promise.all([
+            fetch(`/api/timeclock/my_sessions/?limit=100`, { headers: {'X-CSRFToken': csrfToken} }),
+            fetch(`/api/timeclock/marks/?from=${info.startStr}&to=${info.endStr}`, { headers: {'X-CSRFToken': csrfToken} })
+          ]);
+          const sessionsData = await sessionsRes.json();
+          const marksData = await marksRes.json();
+
+          const sessionEvents = (sessionsData.sessions || []).map(s => ({
+            title: `${s.duration_hours.toFixed(2)} ч.`,
+            start: s.start_time,
+            end: s.end_time || null,
+            color: s.is_closed ? '#71dd37' : '#ffab00',
+            allDay: false
+          }));
+          const markColors = { 'К': '#03c3ec', 'Б': '#ff3e1d', 'А': '#8592a3', 'О': '#696cff', 'В': '#9e77ed' };
+          const markEvents = (marksData.marks || []).map(m => ({
+            title: m.code,
+            start: m.date,
+            allDay: true,
+            color: markColors[m.code] || '#8592a3'
+          }));
+          return [...sessionEvents, ...markEvents];
+        } catch (e) {
+          console.error('Ошибка загрузки событий:', e);
+          return [];
+        }
+      },
+      dateClick: function(info) {
+        // открыть модал для выбора отметки
+        const modalEl = document.getElementById('markModal');
+        if (!modalEl) return;
+        modalEl.dataset.date = info.dateStr;
+        document.getElementById('markDateLabel').textContent = info.date.toLocaleDateString('ru-RU');
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+      }
+    });
+    calendar.render();
+  }
+
+  // Экспорт Excel
+  document.getElementById('exportBtn')?.addEventListener('click', function() {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const from = firstDay.toISOString().split('T')[0];
+    const to = lastDay.toISOString().split('T')[0];
+    window.location.href = `/api/timeclock/export_xlsx/?from=${from}&to=${to}`;
+  });
+
+  // События кнопок
+  document.getElementById('startWorkBtn')?.addEventListener('click', startWork);
+  document.getElementById('stopWorkBtn')?.addEventListener('click', stopWork);
+
+  // Инициализация
+  updateSessionStatus();
+  loadSessions();
+  initCalendar();
+
+  // Heartbeat каждые 5 минут
+  heartbeatInterval = setInterval(sendHeartbeat, 5 * 60 * 1000);
+  sendHeartbeat(); // сразу при загрузке
+
+  // Обновление статуса каждую минуту
+  setInterval(updateSessionStatus, 60 * 1000);
+
+  // Обработчик кнопок модала отметки
+  document.getElementById('markModal')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-code]');
+    if (!btn) return;
+    const code = btn.getAttribute('data-code');
+    const date = document.getElementById('markModal').dataset.date;
+    try {
+      const res = await fetch('/api/timeclock/set_mark/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({date, code})
+      });
+      if (res.ok && calendar) {
+        // Обновим календарь грубо
+        calendar.refetchEvents && calendar.refetchEvents();
+      }
+    } catch (err) { console.error(err); }
+  });
+})();
+</script>
+{% endblock %}
+

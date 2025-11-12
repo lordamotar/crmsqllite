@@ -8,6 +8,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include(('apps.accounts.urls', 'accounts'), namespace='api_accounts')),
     path('accounts/', include(('apps.accounts.urls', 'accounts'), namespace='accounts')),
+    path('api/timeclock/', include(('apps.timeclock.urls', 'timeclock'), namespace='api_timeclock')),
+    path('timeclock/', include(('apps.timeclock.urls', 'timeclock'), namespace='timeclock')),
     path('analytics/', include('apps.analytics.urls_pages')),
     path('analytics/data/', include('apps.analytics.urls')),
     path('dashboard/', include('apps.dashboard.urls')),

@@ -303,12 +303,12 @@
                     <td>{{ item.branch_city }}</td>
                     <td>{{ item.product_code }}</td>
                     <td>
-                      {% if item.tire_type and item.segment %}
-                        {{ item.tire_type }} {{ item.segment }}
-                      {% elif item.tire_type %}
-                        {{ item.tire_type }}
+                      {% if item.segment and item.tire_type %}
+                        {{ item.segment }} • {{ item.tire_type }}
                       {% elif item.segment %}
                         {{ item.segment }}
+                      {% elif item.tire_type %}
+                        {{ item.tire_type }}
                       {% else %}
                         —
                       {% endif %}
@@ -345,12 +345,12 @@
                     <td>{{ item.branch_city }}</td>
                     <td>{{ item.product_code }}</td>
                     <td>
-                      {% if item.tire_type and item.segment %}
-                        {{ item.tire_type }} {{ item.segment }}
-                      {% elif item.tire_type %}
-                        {{ item.tire_type }}
+                      {% if item.segment and item.tire_type %}
+                        {{ item.segment }} • {{ item.tire_type }}
                       {% elif item.segment %}
                         {{ item.segment }}
+                      {% elif item.tire_type %}
+                        {{ item.tire_type }}
                       {% else %}
                         —
                       {% endif %}

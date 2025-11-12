@@ -37,6 +37,7 @@ LOCAL_APPS = [
     'apps.dashboard',
     'apps.plans',
     'apps.analytics',
+    'apps.timeclock',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -48,8 +49,10 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'config.middleware.LoginRequiredMiddleware',
+    'apps.timeclock.middleware.WorkSessionRequiredMiddleware',  # Проверка активной рабочей сессии
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.timeclock.middleware.TimeclockActivityMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

@@ -350,6 +350,7 @@ def add_order(request):
                     product_name=product.name,
                     price=price,
                     segment=product.assortment_group or '',
+                    tire_type=product.tire_type or '',
                     branch_city=city,  # Используем город из формы
                     quantity=quantity,
                     amount=price * quantity,
@@ -508,6 +509,7 @@ def edit_order(request, pk):
                     product_name=product.name,
                     price=price,
                     segment=product.assortment_group or '',
+                    tire_type=product.tire_type or '',
                     branch_city=city,  # Используем город из формы
                     quantity=quantity,
                     amount=price * quantity,
